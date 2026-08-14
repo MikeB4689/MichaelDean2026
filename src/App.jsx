@@ -1,3 +1,5 @@
+ 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import "./App.css";
 
@@ -15,91 +17,108 @@ import Footer from "./components/Footer";
 const sectionVariants = {
   hidden: {
     opacity: 0,
-    y: 50,
+    y: 30,
   },
 
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.7,
+      duration: 0.6,
       ease: "easeOut",
     },
   },
 };
 
-const AnimatedSection = ({ children, id }) => {
+const AnimatedSection = ({ children }) => {
   return (
-    <motion.section
-      id={id}
+    <motion.div
       variants={sectionVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{
         once: true,
-        amount: 0.15,
+        amount: 0.1,
       }}
     >
       {children}
-    </motion.section>
+    </motion.div>
   );
 };
 
 function App() {
-  return (
-    <div className="min-h-screen">
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
 
+    if (savedTheme) {
+      return savedTheme === "dark";
+    }
+
+    return true;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    root.classList.toggle("dark", isDark);
+
+    localStorage.setItem(
+      "theme",
+      isDark ? "dark" : "light"
+    );
+  }, [isDark]);
+
+  const toggleTheme = () => {
+    setIsDark((current) => !current);
+  };
+
+  return (
+    <div
+      className="
+        min-h-screen
+        bg-bg
+        text-text
+        transition-colors
+        duration-300
+      "
+    >
       {/* =========================
           NAVBAR
       ========================= */}
 
-      <Navbar />
+      <Navbar
+        isDark={isDark}
+        toggleTheme={toggleTheme}
+      />
 
 
       {/* =========================
           MAIN CONTENT
       ========================= */}
 
-      <main className="mx-auto w-full">
+      <main className="w-full">
 
-        {/* HERO */}
-
-        <AnimatedSection id="home">
+        <AnimatedSection>
           <Hero personalData={portfolio} />
         </AnimatedSection>
 
-
-        {/* ABOUT */}
-
-        <AnimatedSection id="about">
+        <AnimatedSection>
           <About personalData={portfolio} />
         </AnimatedSection>
 
-
-        {/* SKILLS */}
-
-        <AnimatedSection id="skills">
+        <AnimatedSection>
           <Skills personalData={portfolio} />
         </AnimatedSection>
 
-
-        {/* EXPERIENCE */}
-
-        <AnimatedSection id="experience">
+        <AnimatedSection>
           <Experience personalData={portfolio} />
         </AnimatedSection>
 
-
-        {/* SERVICES */}
-
-        <AnimatedSection id="services">
+        <AnimatedSection>
           <Services personalData={portfolio} />
         </AnimatedSection>
 
-
-        {/* CONTACT */}
-
-        <AnimatedSection id="contact">
+        <AnimatedSection>
           <Contact personalData={portfolio} />
         </AnimatedSection>
 
@@ -111,9 +130,9 @@ function App() {
       ========================= */}
 
       <Footer personalData={portfolio} />
-
     </div>
   );
 }
 
 export default App;
+ 

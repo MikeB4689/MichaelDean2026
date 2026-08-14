@@ -1,41 +1,38 @@
+ 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import resume from "../assets/Michael Resume 2026.pdf";
 
-const Navbar = () => {
+const navbarButtons = [
+  {
+    id: "home",
+    label: "Home",
+  },
+  {
+    id: "about",
+    label: "About",
+  },
+  {
+    id: "skills",
+    label: "Skills",
+  },
+  {
+    id: "experience",
+    label: "Experience",
+  },
+  {
+    id: "services",
+    label: "Services",
+  },
+  {
+    id: "contact",
+    label: "Contact",
+  },
+];
+
+const Navbar = ({ isDark, toggleTheme }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-
-  // =====================================
-  // NAVIGATION LINKS
-  // =====================================
-
-  const navbarButtons = [
-    {
-      id: "home",
-      label: "Home",
-    },
-    {
-      id: "about",
-      label: "About",
-    },
-    {
-      id: "skills",
-      label: "Skills",
-    },
-    {
-      id: "experience",
-      label: "ExperienceS",
-    },
-    {
-      id: "services",
-      label: "Services",
-    },
-    {
-      id: "contact",
-      label: "Contact",
-    },
-  ];
 
   // =====================================
   // DETECT ACTIVE SECTION
@@ -43,8 +40,10 @@ const Navbar = () => {
 
   useEffect(() => {
     const sections = navbarButtons
-      .map((item) => document.getElementById(item.id))
+      .map(({ id }) => document.getElementById(id))
       .filter(Boolean);
+
+    if (!sections.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -52,7 +51,8 @@ const Navbar = () => {
           .filter((entry) => entry.isIntersecting)
           .sort(
             (a, b) =>
-              b.intersectionRatio - a.intersectionRatio
+              b.intersectionRatio -
+              a.intersectionRatio
           );
 
         if (visibleSections.length > 0) {
@@ -72,27 +72,35 @@ const Navbar = () => {
     });
 
     return () => {
-      sections.forEach((section) => {
-        observer.unobserve(section);
-      });
+      observer.disconnect();
     };
   }, []);
 
   // =====================================
-  // NAVIGATION CLICK
+  // NAVIGATION
   // =====================================
 
   const handleNavClick = (sectionId) => {
     setIsOpen(false);
 
-    const section = document.getElementById(sectionId);
+    const section =
+      document.getElementById(sectionId);
 
-    if (section) {
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+    if (!section) return;
+
+    section.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  // =====================================
+  // THEME TOGGLE
+  // =====================================
+
+  const handleThemeToggle = () => {
+    toggleTheme();
+    setIsOpen(false);
   };
 
   return (
@@ -123,6 +131,8 @@ const Navbar = () => {
         bg-navbar/95
         shadow-card
         backdrop-blur-md
+        transition-colors
+        duration-300
       "
     >
       {/* =====================================
@@ -159,6 +169,7 @@ const Navbar = () => {
             gap-2
             whitespace-nowrap
           "
+          aria-label="Go to home"
         >
           <span
             className="
@@ -188,230 +199,239 @@ const Navbar = () => {
             DESKTOP NAVIGATION
         ===================================== */}
 
-        <ul
-          className="
-            hidden
-            items-center
-            gap-2
-            md:flex
-            lg:gap-4
-          "
-        >
-          {navbarButtons.map((button) => {
-            const isActive =
-              activeSection === button.id;
+        <div className="hidden items-center gap-3 md:flex lg:gap-4">
+          <ul className="flex items-center gap-2 lg:gap-4">
+            {navbarButtons.map((button) => {
+              const isActive =
+                activeSection === button.id;
 
-            return (
-              <li key={button.id}>
-                <motion.button
-                  type="button"
-                  onClick={() =>
-                    handleNavClick(button.id)
-                  }
-                  whileHover={{
-                    y: -2,
-                  }}
-                  whileTap={{
-                    scale: 0.96,
-                  }}
-                  className={`
-                    relative
-                    inline-flex
-                    items-center
-                    rounded-md
-                    border
-                    px-3
-                    py-2
-                    text-sm
-                    transition-all
-                    duration-200
-
-                    ${
-                      isActive
-                        ? `
-                          border-primary
-                          bg-primary/10
-                          text-primary
-                        `
-                        : `
-                          border-transparent
-                          text-nav
-                          hover:border-primary
-                          hover:text-primary
-                        `
+              return (
+                <li key={button.id}>
+                  <motion.button
+                    type="button"
+                    onClick={() =>
+                      handleNavClick(button.id)
                     }
-                  `}
-                >
-                  {button.label}
+                    whileHover={{
+                      y: -2,
+                    }}
+                    whileTap={{
+                      scale: 0.96,
+                    }}
+                    className={`
+                      relative
+                      inline-flex
+                      items-center
+                      rounded-md
+                      border
+                      px-3
+                      py-2
+                      text-sm
+                      transition-all
+                      duration-200
 
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeNav"
-                      className="
-                        absolute
-                        -bottom-[1px]
-                        left-1/2
-                        h-[2px]
-                        w-5
-                        -translate-x-1/2
-                        rounded-full
-                        bg-primary
-                      "
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </motion.button>
-              </li>
-            );
-          })}
+                      ${
+                        isActive
+                          ? `
+                            border-primary
+                            bg-primary/10
+                            text-primary
+                          `
+                          : `
+                            border-transparent
+                            text-nav
+                            hover:border-primary
+                            hover:text-primary
+                          `
+                      }
+                    `}
+                  >
+                    {button.label}
+
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeNav"
+                        className="
+                          absolute
+                          -bottom-[1px]
+                          left-1/2
+                          h-[2px]
+                          w-5
+                          -translate-x-1/2
+                          rounded-full
+                          bg-primary
+                        "
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                  </motion.button>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* =====================================
+              THEME SWITCH
+          ===================================== */}
+
+          <ThemeToggle
+            isDark={isDark}
+            onToggle={handleThemeToggle}
+          />
 
           {/* =====================================
               CV BUTTON
           ===================================== */}
 
-          <li className="ml-2">
-            <motion.a
-              href={resume}
-              download="Michael-Dean-Belen-CV.pdf"
-              whileHover={{
-                scale: 1.04,
-                y: -2,
-              }}
-              whileTap={{
-                scale: 0.96,
-              }}
-              className="
-                inline-flex
-                items-center
-                rounded-md
-                border
-                border-primary
-                px-4
-                py-2
-                text-sm
-                font-medium
-                text-primary
-                transition-all
-                duration-200
-                hover:bg-primary
-                hover:text-bg
-                hover:shadow-primary
-              "
-            >
-              Download my CV
+          <motion.a
+            href={resume}
+            download="Michael-Dean-Belen-CV.pdf"
+            whileHover={{
+              scale: 1.04,
+              y: -2,
+            }}
+            whileTap={{
+              scale: 0.96,
+            }}
+            className="
+              inline-flex
+              items-center
+              rounded-md
+              border
+              border-primary
+              px-4
+              py-2
+              text-sm
+              font-medium
+              text-primary
+              transition-all
+              duration-200
+              hover:bg-primary
+              hover:text-bg
+              hover:shadow-primary
+            "
+          >
+            Download CV
 
-              <span className="ml-2">
-                ↓
-              </span>
-            </motion.a>
-          </li>
-        </ul>
+            <span className="ml-2">
+              ↓
+            </span>
+          </motion.a>
+        </div>
 
         {/* =====================================
-            MOBILE BUTTON
+            MOBILE CONTROLS
         ===================================== */}
 
-        <motion.button
-          type="button"
-          onClick={() =>
-            setIsOpen((prev) => !prev)
-          }
-          whileTap={{
-            scale: 0.9,
-          }}
-          className="
-            flex
-            h-10
-            w-10
-            items-center
-            justify-center
-            rounded-md
-            border
-            border-border
-            text-primary
-            transition-all
-            duration-200
-            hover:border-primary
-            hover:bg-primary/10
-            md:hidden
-          "
-          aria-label={
-            isOpen
-              ? "Close navigation menu"
-              : "Open navigation menu"
-          }
-          aria-expanded={isOpen}
-        >
-          <AnimatePresence mode="wait">
-            {isOpen ? (
-              <motion.svg
-                key="close"
-                initial={{
-                  opacity: 0,
-                  rotate: -90,
-                }}
-                animate={{
-                  opacity: 1,
-                  rotate: 0,
-                }}
-                exit={{
-                  opacity: 0,
-                  rotate: 90,
-                }}
-                transition={{
-                  duration: 0.2,
-                }}
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </motion.svg>
-            ) : (
-              <motion.svg
-                key="menu"
-                initial={{
-                  opacity: 0,
-                  rotate: 90,
-                }}
-                animate={{
-                  opacity: 1,
-                  rotate: 0,
-                }}
-                exit={{
-                  opacity: 0,
-                  rotate: -90,
-                }}
-                transition={{
-                  duration: 0.2,
-                }}
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </motion.svg>
-            )}
-          </AnimatePresence>
-        </motion.button>
+        <div className="flex items-center gap-2 md:hidden">
+
+          <ThemeToggle
+            isDark={isDark}
+            onToggle={handleThemeToggle}
+          />
+
+          <motion.button
+            type="button"
+            onClick={() =>
+              setIsOpen((prev) => !prev)
+            }
+            whileTap={{
+              scale: 0.9,
+            }}
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-md
+              border
+              border-border
+              text-primary
+              transition-all
+              duration-200
+              hover:border-primary
+              hover:bg-primary/10
+            "
+            aria-label={
+              isOpen
+                ? "Close navigation menu"
+                : "Open navigation menu"
+            }
+            aria-expanded={isOpen}
+          >
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.svg
+                  key="close"
+                  initial={{
+                    opacity: 0,
+                    rotate: -90,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    rotate: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    rotate: 90,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                  }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </motion.svg>
+              ) : (
+                <motion.svg
+                  key="menu"
+                  initial={{
+                    opacity: 0,
+                    rotate: 90,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    rotate: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    rotate: -90,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                  }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </motion.svg>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+        </div>
       </div>
 
       {/* =====================================
@@ -470,7 +490,9 @@ const Navbar = () => {
                       <button
                         type="button"
                         onClick={() =>
-                          handleNavClick(button.id)
+                          handleNavClick(
+                            button.id
+                          )
                         }
                         className={`
                           block
@@ -520,6 +542,10 @@ const Navbar = () => {
                   opacity: 1,
                   y: 0,
                 }}
+                transition={{
+                  delay:
+                    navbarButtons.length * 0.05,
+                }}
                 className="mt-3"
               >
                 <motion.a
@@ -565,4 +591,144 @@ const Navbar = () => {
   );
 };
 
+
+// =====================================
+// THEME TOGGLE
+// =====================================
+
+const ThemeToggle = ({
+  isDark,
+  onToggle,
+}) => {
+  return (
+    <motion.button
+      type="button"
+      onClick={onToggle}
+      whileTap={{
+        scale: 0.92,
+      }}
+      className="
+        relative
+        flex
+        h-10
+        w-10
+        items-center
+        justify-center
+        overflow-hidden
+        rounded-full
+        border
+        border-border
+        bg-card
+        text-primary
+        transition-all
+        duration-300
+        hover:border-primary
+        hover:bg-primary/10
+        focus:outline-none
+        focus:ring-2
+        focus:ring-primary/40
+      "
+      aria-label={
+        isDark
+          ? "Switch to light mode"
+          : "Switch to dark mode"
+      }
+      title={
+        isDark
+          ? "Switch to light mode"
+          : "Switch to dark mode"
+      }
+    >
+      <AnimatePresence mode="wait">
+        {isDark ? (
+          <motion.svg
+            key="sun"
+            initial={{
+              opacity: 0,
+              rotate: -90,
+              scale: 0.5,
+            }}
+            animate={{
+              opacity: 1,
+              rotate: 0,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+              rotate: 90,
+              scale: 0.5,
+            }}
+            transition={{
+              duration: 0.25,
+            }}
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.8}
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+            />
+
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="
+                M12 2v2
+                M12 20v2
+                M4.93 4.93l1.42 1.42
+                M17.65 17.65l1.42 1.42
+                M2 12h2
+                M20 12h2
+                M4.93 19.07l1.42-1.42
+                M17.65 6.35l1.42-1.42
+              "
+            />
+          </motion.svg>
+        ) : (
+          <motion.svg
+            key="moon"
+            initial={{
+              opacity: 0,
+              rotate: 90,
+              scale: 0.5,
+            }}
+            animate={{
+              opacity: 1,
+              rotate: 0,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+              rotate: -90,
+              scale: 0.5,
+            }}
+            transition={{
+              duration: 0.25,
+            }}
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="
+                M21 12.79A9 9 0 1 1
+                11.21 3
+                A7 7 0 0 0
+                21 12.79Z
+              "
+            />
+          </motion.svg>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+};
+
 export default Navbar;
+ 
