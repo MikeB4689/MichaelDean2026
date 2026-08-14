@@ -25,7 +25,7 @@ const Navbar = () => {
     },
     {
       id: "experience",
-      label: "Experience",
+      label: "ExperienceS",
     },
     {
       id: "services",
