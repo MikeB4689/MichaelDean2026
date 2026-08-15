@@ -21,7 +21,7 @@ const portfolio = {
 
     availability: "Available for work",
 
-    profileImage: "./src/assets/profile.png",
+    profileImage: "../src/assets/profile.png",
 
     intro:
       "I build practical web and mobile applications and provide reliable IT support, troubleshooting, and technical solutions.",

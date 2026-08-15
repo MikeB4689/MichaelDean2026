@@ -6,7 +6,7 @@ import {
   useTransform,
 } from "framer-motion";
 import resume from "../assets/Michael Resume 2026.pdf";
-
+import Image from "../assets/profile.png"
 const Hero = ({ personalData }) => {
   const {
     personalInfo = {},
@@ -887,7 +887,7 @@ const Hero = ({ personalData }) => {
                 "
               >
                 <img
-                  src={personalInfo.profileImage}
+                  src={Image}
                   alt={`Professional portrait of ${personalInfo.name}`}
                   className="
                     h-full
