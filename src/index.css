@@ -1,25 +1,25 @@
+ 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
 
 @import "tailwindcss";
 
-
-/* ========================================
+/* =========================================================
    TAILWIND THEME
-======================================== */
+========================================================= */
 
 @theme {
 
-  /* ======================================
+  /* =========================
      FONTS
-  ====================================== */
+  ========================= */
 
   --font-sans: "Poppins", sans-serif;
   --font-heading: "Poppins", sans-serif;
 
 
-  /* ======================================
-     RESPONSIVE BREAKPOINTS
-  ====================================== */
+  /* =========================
+     BREAKPOINTS
+  ========================= */
 
   --breakpoint-xs: 480px;
   --breakpoint-sm: 640px;
@@ -29,9 +29,9 @@
   --breakpoint-2xl: 1536px;
 
 
-  /* ======================================
-     BACKGROUNDS
-  ====================================== */
+  /* =========================
+     DARK THEME COLORS
+  ========================= */
 
   --color-bg: #050A24;
   --color-bg-secondary: #08133B;
@@ -43,12 +43,10 @@
 
   --color-input: #0A1234;
 
-  --color-overlay: rgba(5, 10, 36, 0.75);
 
-
-  /* ======================================
-     PRIMARY COLORS
-  ====================================== */
+  /* =========================
+     PRIMARY
+  ========================= */
 
   --color-primary: #08C8FF;
   --color-primary-light: #18BFFF;
@@ -62,22 +60,21 @@
   --color-purple-dark: #3B32CC;
 
 
-  /* ======================================
-     ACCENT COLORS
-  ====================================== */
+  /* =========================
+     ACCENT
+  ========================= */
 
   --color-accent: #FFD23F;
   --color-accent-light: #FFE477;
   --color-accent-dark: #FFB000;
 
 
-  /* ======================================
-     TEXT COLORS
-  ====================================== */
+  /* =========================
+     TEXT
+  ========================= */
 
   --color-text: #FFFFFF;
   --color-text-primary: #FFFFFF;
-
   --color-text-secondary: #D9E2FF;
 
   --color-muted: #B8C3E6;
@@ -87,9 +84,9 @@
   --color-nav: #D9E2FF;
 
 
-  /* ======================================
-     BORDER COLORS
-  ====================================== */
+  /* =========================
+     BORDERS
+  ========================= */
 
   --color-border: #24346D;
   --color-border-light: #25346F;
@@ -100,9 +97,9 @@
   --color-border-accent: #08C8FF;
 
 
-  /* ======================================
-     CARD COLORS
-  ====================================== */
+  /* =========================
+     CARDS
+  ========================= */
 
   --color-card: #0C1745;
   --color-card-light: #111E55;
@@ -111,86 +108,18 @@
   --color-icon-bg: #11215C;
 
 
-  /* ======================================
+  /* =========================
      STATES
-  ====================================== */
+  ========================= */
 
   --color-success: #22C55E;
   --color-danger: #EF4444;
   --color-warning: #FFD23F;
 
 
-  /* ======================================
-     GLOW COLORS
-  ====================================== */
-
-  --color-glow-blue: rgba(23, 54, 255, 0.12);
-
-  --color-glow-purple: rgba(123, 44, 255, 0.10);
-
-  --color-glow-primary: rgba(8, 200, 255, 0.15);
-
-  --color-glow-accent: rgba(255, 210, 63, 0.12);
-
-
-  /* ======================================
-     CONTAINER WIDTHS
-  ====================================== */
-
-  --width-content: 1280px;
-
-  --width-wide: 1320px;
-
-  --width-text: 768px;
-
-  --width-form: 740px;
-
-  --width-hero: 1200px;
-
-
-  /* ======================================
-     TYPOGRAPHY
-  ====================================== */
-
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 17px;
-  --text-lg: 18px;
-
-  --text-xl: 21px;
-  --text-2xl: 24px;
-  --text-3xl: 28px;
-
-  --text-4xl: 34px;
-  --text-5xl: 42px;
-  --text-6xl: 52px;
-
-  --text-hero: 62px;
-
-
-  /* ======================================
-     LINE HEIGHT
-  ====================================== */
-
-  --leading-tight: 1.15;
-  --leading-heading: 1.2;
-  --leading-normal: 1.45;
-  --leading-relaxed: 1.7;
-
-
-  /* ======================================
-     LETTER SPACING
-  ====================================== */
-
-  --tracking-tight: -0.02em;
-  --tracking-normal: 0.18px;
-  --tracking-wide: 0.05em;
-  --tracking-wider: 0.1em;
-
-
-  /* ======================================
+  /* =========================
      GRADIENTS
-  ====================================== */
+  ========================= */
 
   --background-image-gradient-bg:
     linear-gradient(
@@ -200,14 +129,12 @@
       #10105A 100%
     );
 
-
   --background-image-gradient-primary:
     linear-gradient(
       135deg,
       #08C8FF 0%,
       #5145FF 100%
     );
-
 
   --background-image-gradient-primary-horizontal:
     linear-gradient(
@@ -216,14 +143,12 @@
       #5145FF 100%
     );
 
-
   --background-image-gradient-gold:
     linear-gradient(
       135deg,
       #FFD23F 0%,
       #FFB000 100%
     );
-
 
   --background-image-gradient-card:
     linear-gradient(
@@ -233,9 +158,9 @@
     );
 
 
-  /* ======================================
+  /* =========================
      SHADOWS
-  ====================================== */
+  ========================= */
 
   --shadow-card:
     0 10px 30px rgba(0, 0, 0, 0.20);
@@ -256,9 +181,50 @@
     0 0 30px rgba(255, 210, 63, 0.15);
 
 
-  /* ======================================
-     BORDER RADIUS
-  ====================================== */
+  /* =========================
+     WIDTHS
+  ========================= */
+
+  --width-content: 1280px;
+  --width-wide: 1320px;
+  --width-text: 768px;
+  --width-form: 740px;
+  --width-hero: 1200px;
+
+
+  /* =========================
+     TYPOGRAPHY
+  ========================= */
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 17px;
+  --text-lg: 18px;
+
+  --text-xl: 21px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+
+  --text-4xl: 34px;
+  --text-5xl: 42px;
+  --text-6xl: 52px;
+
+  --text-hero: 62px;
+
+
+  /* =========================
+     LINE HEIGHT
+  ========================= */
+
+  --leading-tight: 1.15;
+  --leading-heading: 1.2;
+  --leading-normal: 1.45;
+  --leading-relaxed: 1.7;
+
+
+  /* =========================
+     RADIUS
+  ========================= */
 
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -268,169 +234,161 @@
 
   --radius-section: 22px;
   --radius-hero: 24px;
-
   --radius-card: 16px;
-
   --radius-pill: 9999px;
 
 
-  /* ======================================
+  /* =========================
      SPACING
-  ====================================== */
+  ========================= */
 
   --spacing-section: 7rem;
   --spacing-section-mobile: 4rem;
-
   --spacing-container: 1.5rem;
 
 
-  /* ======================================
+  /* =========================
      ANIMATION
-  ====================================== */
+  ========================= */
 
   --animate-float: float 4s ease-in-out infinite;
-
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
-
 }
 
 
-/* ========================================
-   CUSTOM ANIMATIONS
-======================================== */
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-
-}
-
-
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-}
-
-
-/* ========================================
-   ROOT
-======================================== */
+/* =========================================================
+   ROOT THEME VARIABLES
+========================================================= */
 
 :root {
 
-  --text: #B8C3E6;
+  color-scheme: dark;
 
+  --text: #B8C3E6;
   --text-h: #FFFFFF;
 
   --bg: #050A24;
+  --bg-secondary: #08133B;
+  --bg-tertiary: #10105A;
+
+  --navbar: #09133B;
+  --section: #09133B;
+
+  --card: #0C1745;
+  --card-light: #111E55;
+  --card-dark: #08102F;
+
+  --input: #0A1234;
 
   --border: #24346D;
+  --border-light: #25346F;
+  --border-dark: #202D61;
 
   --accent: #08C8FF;
+  --accent-bg: rgba(8, 200, 255, 0.10);
+  --accent-border: rgba(8, 200, 255, 0.50);
 
-  --accent-bg: rgba(8, 200, 255, 0.1);
+  --nav-text: #D9E2FF;
 
-  --accent-border: rgba(8, 200, 255, 0.5);
+  --overlay: rgba(5, 10, 36, 0.75);
 
   --shadow:
     rgba(0, 0, 0, 0.25) 0 10px 30px -5px;
 
-
-  /* ======================================
-     GLOBAL TYPOGRAPHY
-  ====================================== */
-
   font-family: "Poppins", sans-serif;
-
   font-size: 18px;
-
   line-height: 1.45;
-
   letter-spacing: 0.18px;
 
-
-  /* ======================================
-     GLOBAL COLORS
-  ====================================== */
-
   color: var(--text);
-
   background: var(--bg);
 
-
-  /* ======================================
-     RENDERING
-  ====================================== */
-
   font-synthesis: none;
-
   text-rendering: optimizeLegibility;
 
   -webkit-font-smoothing: antialiased;
-
   -moz-osx-font-smoothing: grayscale;
 }
 
 
-/* ========================================
+/* =========================================================
+   LIGHT THEME
+========================================================= */
+
+:root:not(.dark) {
+
+  color-scheme: light;
+
+  --text: #475569;
+  --text-h: #0F172A;
+
+  --bg: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --bg-tertiary: #E2E8F0;
+
+  --navbar: rgba(255, 255, 255, 0.95);
+  --section: #FFFFFF;
+
+  --card: #FFFFFF;
+  --card-light: #FFFFFF;
+  --card-dark: #F1F5F9;
+
+  --input: #FFFFFF;
+
+  --border: #CBD5E1;
+  --border-light: #E2E8F0;
+  --border-dark: #94A3B8;
+
+  --accent: #0284C7;
+  --accent-bg: rgba(2, 132, 199, 0.08);
+  --accent-border: rgba(2, 132, 199, 0.40);
+
+  --nav-text: #334155;
+
+  --overlay: rgba(248, 250, 252, 0.80);
+
+  --shadow:
+    rgba(15, 23, 42, 0.12) 0 10px 30px -5px;
+}
+
+
+/* =========================================================
    GLOBAL RESET
-======================================== */
+========================================================= */
 
 * {
   box-sizing: border-box;
 }
 
 
-/* ========================================
-   HTML
-======================================== */
-
 html {
-
   scroll-behavior: smooth;
-
   scroll-padding-top: 100px;
 }
 
 
-/* ========================================
-   BODY
-======================================== */
-
 body {
-
   margin: 0;
 
   min-width: 320px;
-
   min-height: 100vh;
 
   background: var(--bg);
-
   color: var(--text);
 
   font-family: "Poppins", sans-serif;
+
+  overflow-x: hidden;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 
-/* ========================================
+/* =========================================================
    HEADINGS
-======================================== */
+========================================================= */
 
 h1,
 h2,
@@ -438,7 +396,6 @@ h3,
 h4,
 h5,
 h6 {
-
   margin: 0;
 
   color: var(--text-h);
@@ -447,155 +404,175 @@ h6 {
 }
 
 
-/* ========================================
+/* =========================================================
    LINKS
-======================================== */
+========================================================= */
 
 a {
-
   color: inherit;
-
   text-decoration: none;
 }
 
 
-/* ========================================
+/* =========================================================
    BUTTONS
-======================================== */
+========================================================= */
 
 button {
-
   font-family: inherit;
-
   cursor: pointer;
 }
 
 
-/* ========================================
-   INPUTS
-======================================== */
+/* =========================================================
+   FORM ELEMENTS
+========================================================= */
 
 input,
 textarea,
 select {
-
   font-family: inherit;
 
   color: var(--text);
-
   background: var(--input);
 
+  border-color: var(--border);
 }
 
 
-/* ========================================
+/* =========================================================
    IMAGES
-======================================== */
+========================================================= */
 
 img {
-
   max-width: 100%;
-
   display: block;
 }
 
 
-/* ========================================
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+section {
+  scroll-margin-top: 100px;
+}
+
+
+/* =========================================================
+   THEME TRANSITIONS
+========================================================= */
+
+body,
+nav,
+section,
+footer,
+button,
+a,
+input,
+textarea,
+select {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+
+/* =========================================================
    TEXT SELECTION
-======================================== */
+========================================================= */
 
 ::selection {
-
   background: var(--accent);
-
   color: var(--bg);
 }
 
 
-/* ========================================
+/* =========================================================
    SCROLLBAR
-======================================== */
+========================================================= */
 
 ::-webkit-scrollbar {
-
   width: 8px;
 }
 
-
 ::-webkit-scrollbar-track {
-
   background: var(--bg);
 }
 
-
 ::-webkit-scrollbar-thumb {
-
   background: var(--border);
-
   border-radius: 999px;
 }
 
-
 ::-webkit-scrollbar-thumb:hover {
-
   background: var(--accent);
 }
 
 
-/* ========================================
-   RESPONSIVE
-======================================== */
-
-/* Extra Small */
+/* =========================================================
+   RESPONSIVE ROOT FONT SIZE
+========================================================= */
 
 @media (max-width: 479px) {
-
   :root {
     font-size: 14px;
   }
-
 }
 
-
-/* Small */
-
 @media (min-width: 480px) {
-
   :root {
     font-size: 15px;
   }
-
 }
 
-
-/* Tablet */
-
 @media (min-width: 768px) {
-
   :root {
     font-size: 16px;
   }
-
 }
 
-
-/* Desktop */
-
 @media (min-width: 1024px) {
-
   :root {
     font-size: 17px;
   }
-
 }
 
-
-/* Large Desktop */
-
 @media (min-width: 1280px) {
-
   :root {
     font-size: 18px;
   }
-
 }
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+ 
