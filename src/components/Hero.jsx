@@ -1,10 +1,173 @@
-import React from "react";
-import profileImage from "../assets/profile.png";
+import React, { useEffect, useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import resume from "../assets/Michael Resume 2026.pdf";
 
 const Hero = ({ personalData }) => {
+  const {
+    personalInfo = {},
+    about = {},
+    highlights = [],
+    technologies = [],
+  } = personalData || {};
+
+  const titles = personalInfo.title || [
+    "Web Developer",
+    "IT Support Specialist",
+  ];
+
+  const primaryTitle = titles[0] || "Web Developer";
+  const secondaryTitle =
+    titles[1] || "IT Support Specialist";
+
+  const coreTechnologies =
+    technologies.length > 0
+      ? technologies.slice(0, 5)
+      : [
+          "React",
+          "JavaScript",
+          "React Native",
+          "IT Support",
+          "Firebase",
+        ];
+
+  /* =====================================================
+     MOUSE POSITION
+  ===================================================== */
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  /* =====================================================
+     SMOOTH MOUSE MOVEMENT
+  ===================================================== */
+
+  const smoothX = useSpring(mouseX, {
+    stiffness: 80,
+    damping: 20,
+    mass: 0.5,
+  });
+
+  const smoothY = useSpring(mouseY, {
+    stiffness: 80,
+    damping: 20,
+    mass: 0.5,
+  });
+
+  /* =====================================================
+     PARALLAX LAYERS
+  ===================================================== */
+
+  const backgroundX = useTransform(
+    smoothX,
+    [-0.5, 0.5],
+    [-25, 25]
+  );
+
+  const backgroundY = useTransform(
+    smoothY,
+    [-0.5, 0.5],
+    [-20, 20]
+  );
+
+  const profileX = useTransform(
+    smoothX,
+    [-0.5, 0.5],
+    [-12, 12]
+  );
+
+  const profileY = useTransform(
+    smoothY,
+    [-0.5, 0.5],
+    [-12, 12]
+  );
+
+  const decorationX = useTransform(
+    smoothX,
+    [-0.5, 0.5],
+    [-20, 20]
+  );
+
+  const decorationY = useTransform(
+    smoothY,
+    [-0.5, 0.5],
+    [-20, 20]
+  );
+
+  /* =====================================================
+     MOUSE HANDLER
+  ===================================================== */
+
+  const handleMouseMove = (event) => {
+    const { clientX, clientY } = event;
+
+    const x =
+      clientX / window.innerWidth - 0.5;
+
+    const y =
+      clientY / window.innerHeight - 0.5;
+
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  /* =====================================================
+     SCROLL PARALLAX
+  ===================================================== */
+
+  const heroRef = useRef(null);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+
+    if (!hero) return;
+
+    const handleScroll = () => {
+      const rect = hero.getBoundingClientRect();
+
+      const viewportHeight = window.innerHeight;
+
+      const progress =
+        (viewportHeight - rect.top) /
+        (viewportHeight + rect.height);
+
+      hero.style.setProperty(
+        "--hero-progress",
+        progress
+      );
+    };
+
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      { passive: true }
+    );
+
+    handleScroll();
+
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+    };
+  }, []);
+
   return (
     <section
+      ref={heroRef}
       id="home"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="
         relative
         w-full
@@ -14,46 +177,116 @@ const Hero = ({ personalData }) => {
         sm:px-6
         sm:py-20
         lg:px-8
-        lg:py-24
+        lg:py-28
+        xl:py-32
       "
     >
+      {/* =================================================
+          BACKGROUND PARALLAX
+      ================================================= */}
 
-      {/* =====================================
-          BACKGROUND GLOW
-      ===================================== */}
-
-      <div
+      <motion.div
+        style={{
+          x: backgroundX,
+          y: backgroundY,
+        }}
         className="
           pointer-events-none
           absolute
-          -left-40
-          top-20
-          h-[350px]
-          w-[350px]
+          -left-48
+          top-10
+          h-[420px]
+          w-[420px]
           rounded-full
           bg-glow-blue
+          opacity-40
           blur-3xl
         "
       />
+
+      <motion.div
+        style={{
+          x: backgroundX,
+          y: backgroundY,
+        }}
+        className="
+          pointer-events-none
+          absolute
+          -right-48
+          top-32
+          h-[450px]
+          w-[450px]
+          rounded-full
+          bg-glow-purple
+          opacity-30
+          blur-3xl
+        "
+      />
+
+      {/* =================================================
+          MOUSE FOLLOW GLOW
+      ================================================= */}
+
+      <motion.div
+        style={{
+          x: smoothX,
+          y: smoothY,
+        }}
+        className="
+          pointer-events-none
+          absolute
+          left-1/2
+          top-1/2
+          h-[300px]
+          w-[300px]
+          -translate-x-1/2
+          -translate-y-1/2
+          rounded-full
+          bg-primary/5
+          blur-[90px]
+        "
+      />
+
+      {/* =================================================
+          BOTTOM GLOW
+      ================================================= */}
+
+      <motion.div
+        style={{
+          x: backgroundX,
+        }}
+        className="
+          pointer-events-none
+          absolute
+          bottom-0
+          left-1/2
+          h-[250px]
+          w-[500px]
+          -translate-x-1/2
+          rounded-full
+          bg-primary/5
+          blur-3xl
+        "
+      />
+
+      {/* =================================================
+          DECORATIVE GRID
+      ================================================= */}
 
       <div
         className="
           pointer-events-none
           absolute
-          -right-40
-          top-40
-          h-[400px]
-          w-[400px]
-          rounded-full
-          bg-glow-purple
-          blur-3xl
+          inset-0
+          opacity-[0.025]
+          [background-image:linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)]
+          [background-size:60px_60px]
         "
       />
 
-
-      {/* =====================================
-          HERO CONTAINER
-      ===================================== */}
+      {/* =================================================
+          CONTAINER
+      ================================================= */}
 
       <div
         className="
@@ -65,41 +298,131 @@ const Hero = ({ personalData }) => {
           max-w-hero
           items-center
           gap-14
-          lg:grid-cols-2
-          lg:gap-20
+          lg:grid-cols-[1.1fr_0.9fr]
+          lg:gap-16
+          xl:gap-24
         "
       >
-
-        {/* =====================================
-            HERO CONTENT
-        ===================================== */}
+        {/* =================================================
+            LEFT CONTENT
+        ================================================= */}
 
         <div className="order-2 lg:order-1">
 
-          {/* Greeting */}
+          {/* AVAILABILITY */}
 
-          <p
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.6,
+            }}
+            className="
+              mb-6
+              inline-flex
+              items-center
+              gap-2.5
+              rounded-full
+              border
+              border-success/30
+              bg-success/5
+              px-3.5
+              py-2
+            "
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span
+                className="
+                  absolute
+                  inline-flex
+                  h-full
+                  w-full
+                  animate-ping
+                  rounded-full
+                  bg-success
+                  opacity-60
+                "
+              />
+
+              <span
+                className="
+                  relative
+                  inline-flex
+                  h-2.5
+                  w-2.5
+                  rounded-full
+                  bg-success
+                "
+              />
+            </span>
+
+            <span
+              className="
+                text-xs
+                font-medium
+                text-success
+                sm:text-sm
+              "
+            >
+              {personalInfo.availability ||
+                "Available for work"}
+            </span>
+          </motion.div>
+
+          {/* GREETING */}
+
+          <motion.p
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.6,
+              delay: 0.1,
+            }}
             className="
               text-sm
               font-semibold
               uppercase
-              tracking-wider
+              tracking-[2.5px]
               text-primary
               sm:text-base
             "
           >
             Hello, I'm
-          </p>
+          </motion.p>
 
+          {/* NAME */}
 
-          {/* Name */}
-
-          <h1
+          <motion.h1
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.7,
+              delay: 0.15,
+            }}
             className="
               mt-3
+              max-w-4xl
               text-4xl
               font-bold
-              leading-tight
+              leading-[1.02]
               tracking-tight
               text-text
               sm:text-5xl
@@ -107,103 +430,152 @@ const Hero = ({ personalData }) => {
               lg:text-hero
             "
           >
-            {personalData.personalInfo.name}
-          </h1>
+            {personalInfo.name}
+          </motion.h1>
 
+          {/* PROFESSIONAL TITLE */}
 
-          {/* =====================================
-              PROFESSIONAL TITLES
-          ===================================== */}
-
-          <div
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.7,
+              delay: 0.25,
+            }}
             className="
-              mt-5
+              mt-6
               flex
               flex-wrap
               items-center
               gap-x-3
-              gap-y-2
-              text-lg
+              gap-y-1
+              text-xl
               font-semibold
-              sm:text-xl
-              md:text-2xl
+              leading-tight
+              sm:text-2xl
+              md:text-3xl
             "
           >
+            <span
+              className="
+                bg-gradient-primary
+                bg-clip-text
+                text-transparent
+              "
+            >
+              {primaryTitle}
+            </span>
 
-            {personalData.personalInfo.title.map(
-              (title, index) => (
+            <span className="text-accent">
+              &
+            </span>
 
-                <React.Fragment key={title}>
+            <span className="text-text">
+              {secondaryTitle}
+            </span>
+          </motion.div>
 
-                  <span
-                    className="
-                      bg-gradient-primary
-                      bg-clip-text
-                      text-transparent
-                    "
-                  >
-                    {title}
-                  </span>
+          {/* ADDITIONAL TITLES */}
 
-                  {index !==
-                    personalData.personalInfo.title.length - 1 && (
-                    <span className="text-accent">
-                      •
-                    </span>
-                  )}
+          {titles.length > 2 && (
+            <div
+              className="
+                mt-4
+                flex
+                flex-wrap
+                items-center
+                gap-x-3
+                gap-y-2
+                text-sm
+                text-muted
+                sm:text-base
+              "
+            >
+              {titles.slice(2).map(
+                (title, index, array) => (
+                  <React.Fragment key={title}>
+                    <span>{title}</span>
 
-                </React.Fragment>
+                    {index < array.length - 1 && (
+                      <span className="text-border">
+                        •
+                      </span>
+                    )}
+                  </React.Fragment>
+                )
+              )}
+            </div>
+          )}
 
-              )
-            )}
+          {/* DESCRIPTION */}
 
-          </div>
-
-
-          {/* =====================================
-              DESCRIPTION
-          ===================================== */}
-
-          <p
+          <motion.p
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.7,
+              delay: 0.3,
+            }}
             className="
               mt-6
-              max-w-text
+              max-w-2xl
               text-base
-              leading-relaxed
+              leading-7
               text-muted
               sm:text-[17px]
+              sm:leading-8
             "
           >
-            {personalData.about.passion}
-          </p>
+            {about.description}
+          </motion.p>
 
+          {/* CTA */}
 
-          {/* =====================================
-              CTA BUTTONS
-          ===================================== */}
-
-          <div
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.7,
+              delay: 0.4,
+            }}
             className="
               mt-8
               flex
               flex-col
-              gap-4
+              gap-3
               sm:flex-row
+              sm:flex-wrap
             "
           >
-
-            {/* Projects */}
-
             <a
               href="#projects"
               className="
+                group
                 inline-flex
                 items-center
                 justify-center
-                rounded-md
+                rounded-lg
                 bg-gradient-primary
                 px-6
-                py-3
+                py-3.5
                 text-sm
                 font-semibold
                 text-text
@@ -215,13 +587,47 @@ const Hero = ({ personalData }) => {
               "
             >
               View My Projects
-              <span className="ml-2">
+
+              <span
+                className="
+                  ml-2
+                  transition-transform
+                  duration-300
+                  group-hover:translate-x-1
+                "
+              >
                 →
               </span>
             </a>
 
+            <a
+              href={resume}
+              download="Michael-Dean-L-Belen-CV.pdf"
+              className="
+                inline-flex
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-primary
+                px-6
+                py-3.5
+                text-sm
+                font-semibold
+                text-primary
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:bg-primary
+                hover:text-bg
+              "
+            >
+              Download CV
 
-            {/* Contact */}
+              <span className="ml-2">
+                ↓
+              </span>
+            </a>
 
             <a
               href="#contact"
@@ -229,29 +635,83 @@ const Hero = ({ personalData }) => {
                 inline-flex
                 items-center
                 justify-center
-                rounded-md
+                rounded-lg
                 border
-                border-primary
+                border-border
                 px-6
-                py-3
+                py-3.5
                 text-sm
                 font-semibold
-                text-primary
+                text-text
                 transition-all
                 duration-300
-                hover:bg-primary
-                hover:text-bg
+                hover:-translate-y-1
+                hover:border-primary
+                hover:bg-primary/10
+                hover:text-primary
               "
             >
               Contact Me
             </a>
+          </motion.div>
 
+          {/* CORE TECHNOLOGIES */}
+
+          <div className="mt-9">
+            <div
+              className="
+                mb-3
+                flex
+                items-center
+                gap-3
+              "
+            >
+              <p
+                className="
+                  text-xs
+                  font-semibold
+                  uppercase
+                  tracking-[1.5px]
+                  text-muted
+                "
+              >
+                Core Technologies
+              </p>
+
+              <span className="h-px w-8 bg-border" />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {coreTechnologies.map(
+                (technology) => (
+                  <span
+                    key={technology}
+                    className="
+                      rounded-full
+                      border
+                      border-border
+                      bg-card
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-medium
+                      text-muted
+                      transition-all
+                      duration-200
+                      hover:-translate-y-1
+                      hover:border-primary/60
+                      hover:bg-primary/5
+                      hover:text-primary
+                    "
+                  >
+                    {technology}
+                  </span>
+                )
+              )}
+            </div>
           </div>
 
-
-          {/* =====================================
-              SMALL INFO
-          ===================================== */}
+          {/* QUICK INFO */}
 
           <div
             className="
@@ -259,49 +719,45 @@ const Hero = ({ personalData }) => {
               flex
               flex-wrap
               items-center
-              gap-5
+              gap-x-6
+              gap-y-3
+              border-t
+              border-border
+              pt-6
               text-xs
               text-muted-dark
               sm:text-sm
             "
           >
+            <span className="flex items-center gap-2">
+              <span className="text-primary">
+                📍
+              </span>
+
+              {personalInfo.location}
+            </span>
+
+            <span className="hidden h-4 w-px bg-border sm:block" />
 
             <span className="flex items-center gap-2">
+              <span className="text-primary">
+                ✦
+              </span>
 
-              <span
-                className="
-                  h-2
-                  w-2
-                  rounded-full
-                  bg-success
-                  animate-pulse
-                "
-              />
-
-              Available for work
-
+              Open to remote opportunities
             </span>
-
-
-            <span className="text-border">
-              |
-            </span>
-
-
-            <span>
-              Philippines 🇵🇭
-            </span>
-
           </div>
-
         </div>
 
+        {/* =================================================
+            RIGHT PROFILE
+        ================================================= */}
 
-        {/* =====================================
-            PROFILE IMAGE
-        ===================================== */}
-
-        <div
+        <motion.div
+          style={{
+            x: profileX,
+            y: profileY,
+          }}
           className="
             order-1
             flex
@@ -310,36 +766,54 @@ const Hero = ({ personalData }) => {
             lg:justify-end
           "
         >
-
           <div className="relative">
 
-            {/* =================================
-                BLUE GLOW
-            ================================= */}
+            {/* MAIN GLOW */}
 
-            <div
+            <motion.div
+              style={{
+                x: backgroundX,
+                y: backgroundY,
+              }}
+              animate={{
+                scale: [1, 1.08, 1],
+              }}
+              transition={{
+                duration: 7,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className="
                 absolute
-                -inset-8
-                rounded-[40px]
+                -inset-10
+                rounded-[50px]
                 bg-primary
                 opacity-10
                 blur-3xl
               "
             />
 
+            {/* PURPLE GLOW */}
 
-            {/* =================================
-                PURPLE GLOW
-            ================================= */}
-
-            <div
+            <motion.div
+              style={{
+                x: decorationX,
+                y: decorationY,
+              }}
+              animate={{
+                scale: [1, 1.12, 1],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className="
                 absolute
-                -bottom-10
-                -right-10
-                h-40
-                w-40
+                -bottom-12
+                -right-12
+                h-48
+                w-48
                 rounded-full
                 bg-purple
                 opacity-20
@@ -347,16 +821,26 @@ const Hero = ({ personalData }) => {
               "
             />
 
+            {/* DECORATIVE STAR */}
 
-            {/* =================================
-                TOP DECORATION
-            ================================= */}
-
-            <div
+            <motion.div
+              style={{
+                x: decorationX,
+                y: decorationY,
+              }}
+              animate={{
+                y: [0, -10, 0],
+                rotate: [0, 8, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className="
                 absolute
-                -right-4
-                -top-4
+                -right-5
+                -top-5
                 z-30
                 flex
                 h-14
@@ -365,57 +849,46 @@ const Hero = ({ personalData }) => {
                 justify-center
                 rounded-full
                 border
-                border-primary
+                border-primary/60
                 bg-bg
                 text-xl
                 text-primary
                 shadow-primary
-                animate-float
               "
             >
               ✦
-            </div>
+            </motion.div>
 
-
-            {/* =================================
-                PROFILE FRAME
-            ================================= */}
+            {/* IMAGE FRAME */}
 
             <div
               className="
                 relative
                 h-[390px]
                 w-[300px]
-                overflow-hidden
-                rounded-[30px]
+                rounded-[32px]
                 bg-gradient-primary
                 p-[3px]
                 shadow-primary-lg
                 sm:h-[450px]
                 sm:w-[350px]
-                md:h-[480px]
-                md:w-[370px]
+                md:h-[500px]
+                md:w-[380px]
               "
             >
-
-              {/* Inner frame */}
-
               <div
                 className="
                   relative
                   h-full
                   w-full
                   overflow-hidden
-                  rounded-[27px]
+                  rounded-[29px]
                   bg-card
                 "
               >
-
-                {/* Image */}
-
                 <img
-                  src={profileImage}
-                  alt={personalData.personalInfo.name}
+                  src={personalInfo.profileImage}
+                  alt={`Professional portrait of ${personalInfo.name}`}
                   className="
                     h-full
                     w-full
@@ -427,11 +900,6 @@ const Hero = ({ personalData }) => {
                   "
                 />
 
-
-                {/* =================================
-                    IMAGE OVERLAY
-                ================================= */}
-
                 <div
                   className="
                     pointer-events-none
@@ -441,14 +909,9 @@ const Hero = ({ personalData }) => {
                     from-bg
                     via-transparent
                     to-primary/10
-                    opacity-70
+                    opacity-80
                   "
                 />
-
-
-                {/* =================================
-                    BOTTOM BADGE
-                ================================= */}
 
                 <div
                   className="
@@ -464,17 +927,16 @@ const Hero = ({ personalData }) => {
                     backdrop-blur-md
                   "
                 >
-
                   <p
                     className="
-                      text-xs
-                      font-medium
+                      text-[11px]
+                      font-semibold
                       uppercase
-                      tracking-wider
+                      tracking-[2px]
                       text-primary
                     "
                   >
-                    IT • WEB • SUPPORT
+                    WEB • IT • SUPPORT
                   </p>
 
                   <p
@@ -487,19 +949,24 @@ const Hero = ({ personalData }) => {
                   >
                     Building practical digital solutions.
                   </p>
-
                 </div>
-
               </div>
-
             </div>
 
+            {/* DEVELOPER BADGE */}
 
-            {/* =================================
-                DEVELOPER DECORATION
-            ================================= */}
-
-            <div
+            <motion.div
+              style={{
+                x: decorationX,
+              }}
+              animate={{
+                y: [0, -7, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className="
                 absolute
                 -bottom-5
@@ -522,18 +989,84 @@ const Hero = ({ personalData }) => {
               "
             >
               {"</>"}
-            </div>
+            </motion.div>
 
+            {/* EXPERIENCE BADGE */}
 
-            {/* =================================
-                STATUS BADGE
-            ================================= */}
+            {highlights.length > 0 && (
+              <motion.div
+                style={{
+                  x: decorationX,
+                }}
+                initial={{
+                  opacity: 0,
+                  x: -15,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                transition={{
+                  delay: 0.7,
+                  duration: 0.5,
+                }}
+                className="
+                  absolute
+                  -left-8
+                  top-1/3
+                  z-30
+                  hidden
+                  rounded-xl
+                  border
+                  border-border
+                  bg-navbar/95
+                  px-4
+                  py-3
+                  shadow-card
+                  backdrop-blur-md
+                  sm:block
+                "
+              >
+                <p
+                  className="
+                    text-lg
+                    font-bold
+                    text-primary
+                  "
+                >
+                  {highlights[0]?.value || "2+"}
+                </p>
 
-            <div
+                <p
+                  className="
+                    mt-0.5
+                    text-[10px]
+                    font-medium
+                    uppercase
+                    tracking-wide
+                    text-muted
+                  "
+                >
+                  Years Development
+                </p>
+              </motion.div>
+            )}
+
+            {/* STATUS BADGE */}
+
+            <motion.div
+              animate={{
+                y: [0, -4, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className="
                 absolute
                 -bottom-6
-                right-4
+                right-3
                 z-30
                 flex
                 items-center
@@ -547,14 +1080,13 @@ const Hero = ({ personalData }) => {
                 shadow-card
               "
             >
-
               <span
                 className="
                   h-2.5
                   w-2.5
+                  animate-pulse
                   rounded-full
                   bg-success
-                  animate-pulse
                 "
               />
 
@@ -565,17 +1097,13 @@ const Hero = ({ personalData }) => {
                   text-nav
                 "
               >
-                Available for work
+                {personalInfo.availability ||
+                  "Available for work"}
               </span>
-
-            </div>
-
+            </motion.div>
           </div>
-
-        </div>
-
+        </motion.div>
       </div>
-
     </section>
   );
 };
