@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
 import { InlineWidget } from "react-calendly";
+import { motion } from "framer-motion";
 
 const Contact = ({ personalData }) => {
   const [formData, setFormData] = useState({
@@ -13,17 +14,32 @@ const Contact = ({ personalData }) => {
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
 
+  const contact = personalData.contact || {};
+  const booking = personalData.booking || {};
+  const personalInfo = personalData.personalInfo || {};
+
+  const maxMessageLength = 1000;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]:
+        name === "message"
+          ? value.slice(0, maxMessageLength)
+          : value,
     }));
+
+    if (status) {
+      setStatus("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (sending) return;
 
     setSending(true);
     setStatus("");
@@ -37,7 +53,7 @@ const Contact = ({ personalData }) => {
           email: formData.email,
           subject: formData.subject,
           message: formData.message,
-          to_email: personalData.contact.email,
+          to_email: contact.email,
         },
         "YOUR_PUBLIC_KEY"
       );
@@ -52,7 +68,6 @@ const Contact = ({ personalData }) => {
       });
     } catch (error) {
       console.error("EmailJS Error:", error);
-
       setStatus("error");
     } finally {
       setSending(false);
@@ -63,125 +78,214 @@ const Contact = ({ personalData }) => {
     <section
       id="contact"
       className="
+        relative
         w-full
+        overflow-hidden
         px-4
-        py-20
+        py-16
         sm:px-6
-        sm:py-24
+        sm:py-20
         lg:px-8
-        lg:py-32
+        lg:py-28
       "
     >
-      <div className="mx-auto w-full max-w-content">
+      {/* =====================================
+          BACKGROUND GLOW
+      ===================================== */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -left-40
+          top-20
+          h-[350px]
+          w-[350px]
+          rounded-full
+          bg-glow-purple
+          blur-3xl
+          opacity-40
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -right-40
+          bottom-20
+          h-[350px]
+          w-[350px]
+          rounded-full
+          bg-glow-blue
+          blur-3xl
+          opacity-40
+        "
+      />
+
+
+      {/* =====================================
+          CONTAINER
+      ===================================== */}
+
+      <div
+        className="
+          relative
+          z-10
+          mx-auto
+          w-full
+          max-w-content
+        "
+      >
 
         {/* =====================================
             HEADER
         ===================================== */}
 
-        <div className="mb-12">
-
-          <div className="flex items-center gap-3">
-
-            <span className="h-px w-10 bg-primary" />
-
-            <p
-              className="
-                text-xs
-                font-semibold
-                uppercase
-                tracking-[3px]
-                text-primary
-              "
-            >
-              Get In Touch
-            </p>
-
-          </div>
-
-          <h2
-            className="
-              mt-4
-              text-4xl
-              font-bold
-              text-text
-              sm:text-5xl
-            "
-          >
-            Let's
-            <span className="text-primary"> Connect</span>
-          </h2>
+        <motion.div
+          className="mb-12"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.2,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
+        >
 
           <p
             className="
-              mt-4
-              max-w-text
               text-sm
-              leading-7
-              text-muted
-              sm:text-base
+              font-semibold
+              uppercase
+              tracking-[2px]
+              text-primary
             "
           >
-            Have a project, job opportunity, or technical
-            question? Send me a message or book a meeting.
+            Get In Touch
           </p>
 
-        </div>
+          <h2
+            className="
+              mt-2
+              text-3xl
+              font-bold
+              tracking-tight
+              text-text
+              sm:text-4xl
+              lg:text-5xl
+            "
+          >
+            Let's{" "}
+            <span className="text-primary">
+              Connect
+            </span>
+          </h2>
+
+          <div
+            className="
+              mt-4
+              h-1
+              w-16
+              rounded-full
+              bg-gradient-primary
+            "
+          />
+
+          <p
+            className="
+              mt-5
+              max-w-2xl
+              text-base
+              leading-7
+              text-muted
+              sm:text-[17px]
+            "
+          >
+            {contact.message ||
+              "Have a project, job opportunity, or technical question? Feel free to get in touch."}
+          </p>
+
+        </motion.div>
 
 
         {/* =====================================
-            CONTACT OPTIONS
+            CONTACT INFO
         ===================================== */}
 
-        <div
+        <motion.div
           className="
-            mb-10
+            mb-8
             grid
-            gap-5
-            md:grid-cols-2
+            gap-4
+            sm:grid-cols-2
+            lg:grid-cols-3
           "
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.15,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
         >
 
-          {/* EMAIL CARD */}
+          {/* EMAIL */}
 
           <a
-            href={`mailto:${personalData.contact.email}`}
+            href={`mailto:${contact.email}`}
             className="
               group
               rounded-2xl
               border
               border-border
               bg-card
-              p-6
+              p-5
               transition-all
               duration-300
               hover:-translate-y-1
-              hover:border-primary
+              hover:border-primary/60
               hover:shadow-primary
             "
           >
 
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-4">
 
               <div
                 className="
                   flex
-                  h-12
-                  w-12
+                  h-11
+                  w-11
                   shrink-0
                   items-center
                   justify-center
                   rounded-xl
-                  border
-                  border-primary/30
                   bg-primary/10
-                  text-xl
+                  text-lg
+                  font-bold
                   text-primary
                 "
               >
                 @
               </div>
 
-              <div className="flex-1">
+              <div className="min-w-0">
 
                 <p
                   className="
@@ -189,48 +293,24 @@ const Contact = ({ personalData }) => {
                     font-semibold
                     uppercase
                     tracking-wider
-                    text-primary
+                    text-muted-dark
                   "
                 >
-                  Prefer Email?
+                  Email
                 </p>
-
-                <h3
-                  className="
-                    mt-1
-                    text-xl
-                    font-semibold
-                    text-text
-                  "
-                >
-                  Send Me an Email
-                </h3>
 
                 <p
                   className="
-                    mt-2
-                    text-sm
-                    leading-6
-                    text-muted
-                  "
-                >
-                  Send me your questions, project details,
-                  or job opportunities directly.
-                </p>
-
-                <span
-                  className="
-                    mt-4
-                    inline-block
+                    mt-1
+                    truncate
                     text-sm
                     font-medium
-                    text-primary
-                    transition-transform
-                    group-hover:translate-x-1
+                    text-text
+                    group-hover:text-primary
                   "
                 >
-                  {personalData.contact.email} →
-                </span>
+                  {contact.email}
+                </p>
 
               </div>
 
@@ -239,49 +319,44 @@ const Contact = ({ personalData }) => {
           </a>
 
 
-          {/* CALENDLY CARD */}
+          {/* PHONE */}
 
           <a
-            href={personalData.booking?.calendarUrl || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`tel:${contact.phone}`}
             className="
               group
               rounded-2xl
               border
               border-border
               bg-card
-              p-6
+              p-5
               transition-all
               duration-300
               hover:-translate-y-1
-              hover:border-accent
+              hover:border-primary/60
               hover:shadow-primary
             "
           >
 
-            <div className="flex items-start gap-4">
+            <div className="flex items-center gap-4">
 
               <div
                 className="
                   flex
-                  h-12
-                  w-12
+                  h-11
+                  w-11
                   shrink-0
                   items-center
                   justify-center
                   rounded-xl
-                  border
-                  border-accent/30
-                  bg-accent/10
-                  text-xl
-                  text-accent
+                  bg-primary/10
+                  text-lg
                 "
               >
-                📅
+                ☎
               </div>
 
-              <div className="flex-1">
+              <div>
 
                 <p
                   className="
@@ -289,49 +364,23 @@ const Contact = ({ personalData }) => {
                     font-semibold
                     uppercase
                     tracking-wider
-                    text-accent
+                    text-muted-dark
                   "
                 >
-                  Let's Talk
+                  Phone
                 </p>
-
-                <h3
-                  className="
-                    mt-1
-                    text-xl
-                    font-semibold
-                    text-text
-                  "
-                >
-                  {personalData.booking?.title || "Book a Meeting"}
-                </h3>
 
                 <p
                   className="
-                    mt-2
-                    text-sm
-                    leading-6
-                    text-muted
-                  "
-                >
-                  {personalData.booking?.description ||
-                    "Choose a convenient date and time for an online meeting."}
-                </p>
-
-                <span
-                  className="
-                    mt-4
-                    inline-block
+                    mt-1
                     text-sm
                     font-medium
-                    text-accent
-                    transition-transform
-                    group-hover:translate-x-1
+                    text-text
+                    group-hover:text-primary
                   "
                 >
-                  {personalData.booking?.buttonText ||
-                    "Schedule a meeting →"}
-                </span>
+                  {contact.phone}
+                </p>
 
               </div>
 
@@ -339,18 +388,90 @@ const Contact = ({ personalData }) => {
 
           </a>
 
-        </div>
+
+          {/* AVAILABILITY */}
+
+          <div
+            className="
+              rounded-2xl
+              border
+              border-border
+              bg-card
+              p-5
+            "
+          >
+
+            <div className="flex items-center gap-4">
+
+              <div
+                className="
+                  flex
+                  h-11
+                  w-11
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-success/10
+                "
+              >
+
+                <span
+                  className="
+                    h-3
+                    w-3
+                    animate-pulse
+                    rounded-full
+                    bg-success
+                  "
+                />
+
+              </div>
+
+              <div>
+
+                <p
+                  className="
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-wider
+                    text-muted-dark
+                  "
+                >
+                  Availability
+                </p>
+
+                <p
+                  className="
+                    mt-1
+                    text-sm
+                    font-semibold
+                    text-success
+                  "
+                >
+                  {personalInfo.availability ||
+                    "Available for work"}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </motion.div>
 
 
         {/* =====================================
-            FORM + CALENDLY
+            MAIN CONTACT GRID
         ===================================== */}
 
         <div
           className="
             grid
             gap-6
-            lg:grid-cols-2
+            lg:grid-cols-[0.9fr_1.1fr]
           "
         >
 
@@ -358,59 +479,198 @@ const Contact = ({ personalData }) => {
               CONTACT FORM
           ===================================== */}
 
-          <form
-            onSubmit={handleSubmit}
-            className="
-              rounded-2xl
-              border
-              border-border
-              bg-card
-              p-6
-              sm:p-8
-            "
+          <motion.div
+            initial={{
+              opacity: 0,
+              x: -25,
+            }}
+            whileInView={{
+              opacity: 1,
+              x: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.1,
+            }}
+            transition={{
+              duration: 0.6,
+            }}
           >
 
-            <div className="mb-8">
-
-              <h3
-                className="
-                  text-2xl
-                  font-bold
-                  text-text
-                "
-              >
-                Send Me a Message
-              </h3>
-
-              <p
-                className="
-                  mt-2
-                  text-sm
-                  text-muted
-                "
-              >
-                I'll receive your message directly through email.
-              </p>
-
-            </div>
-
-
-            {/* NAME + EMAIL */}
-
-            <div
+            <form
+              onSubmit={handleSubmit}
               className="
-                grid
-                gap-5
-                sm:grid-cols-2
+                rounded-2xl
+                border
+                border-border
+                bg-card
+                p-6
+                shadow-card
+                sm:p-8
               "
             >
 
-              {/* NAME */}
+              {/* FORM HEADER */}
 
-              <div>
+              <div className="mb-7">
+
+                <p
+                  className="
+                    text-xs
+                    font-semibold
+                    uppercase
+                    tracking-[1.5px]
+                    text-primary
+                  "
+                >
+                  Send a Message
+                </p>
+
+                <h3
+                  className="
+                    mt-2
+                    text-2xl
+                    font-bold
+                    text-text
+                  "
+                >
+                  Tell Me About Your Project
+                </h3>
+
+                <p
+                  className="
+                    mt-2
+                    text-sm
+                    leading-6
+                    text-muted
+                  "
+                >
+                  Whether it's a job opportunity, website,
+                  technical issue, or collaboration, I'd be
+                  happy to hear from you.
+                </p>
+
+              </div>
+
+
+              {/* =================================
+                  NAME + EMAIL
+              ================================= */}
+
+              <div
+                className="
+                  grid
+                  gap-5
+                  sm:grid-cols-2
+                "
+              >
+
+                {/* NAME */}
+
+                <div>
+
+                  <label
+                    htmlFor="name"
+                    className="
+                      mb-2
+                      block
+                      text-sm
+                      font-medium
+                      text-text
+                    "
+                  >
+                    Your Name
+                  </label>
+
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    autoComplete="name"
+                    placeholder="John Doe"
+                    className="
+                      w-full
+                      rounded-lg
+                      border
+                      border-border
+                      bg-input
+                      px-4
+                      py-3
+                      text-sm
+                      text-text
+                      outline-none
+                      transition-all
+                      placeholder:text-muted-dark
+                      focus:border-primary
+                      focus:ring-2
+                      focus:ring-primary/20
+                    "
+                  />
+
+                </div>
+
+
+                {/* EMAIL */}
+
+                <div>
+
+                  <label
+                    htmlFor="email"
+                    className="
+                      mb-2
+                      block
+                      text-sm
+                      font-medium
+                      text-text
+                    "
+                  >
+                    Email Address
+                  </label>
+
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="
+                      w-full
+                      rounded-lg
+                      border
+                      border-border
+                      bg-input
+                      px-4
+                      py-3
+                      text-sm
+                      text-text
+                      outline-none
+                      transition-all
+                      placeholder:text-muted-dark
+                      focus:border-primary
+                      focus:ring-2
+                      focus:ring-primary/20
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+
+              {/* =================================
+                  SUBJECT
+              ================================= */}
+
+              <div className="mt-5">
 
                 <label
-                  htmlFor="name"
+                  htmlFor="subject"
                   className="
                     mb-2
                     block
@@ -419,17 +679,17 @@ const Contact = ({ personalData }) => {
                     text-text
                   "
                 >
-                  Your Name
+                  Subject
                 </label>
 
                 <input
-                  id="name"
-                  name="name"
+                  id="subject"
+                  name="subject"
                   type="text"
-                  value={formData.name}
+                  value={formData.subject}
                   onChange={handleChange}
                   required
-                  placeholder="Your name"
+                  placeholder="Job opportunity / Project inquiry"
                   className="
                     w-full
                     rounded-lg
@@ -444,41 +704,63 @@ const Contact = ({ personalData }) => {
                     transition-all
                     placeholder:text-muted-dark
                     focus:border-primary
-                    focus:ring-1
-                    focus:ring-primary
+                    focus:ring-2
+                    focus:ring-primary/20
                   "
                 />
 
               </div>
 
 
-              {/* EMAIL */}
+              {/* =================================
+                  MESSAGE
+              ================================= */}
 
-              <div>
+              <div className="mt-5">
 
-                <label
-                  htmlFor="email"
+                <div
                   className="
                     mb-2
-                    block
-                    text-sm
-                    font-medium
-                    text-text
+                    flex
+                    items-center
+                    justify-between
                   "
                 >
-                  Email Address
-                </label>
 
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
+                  <label
+                    htmlFor="message"
+                    className="
+                      text-sm
+                      font-medium
+                      text-text
+                    "
+                  >
+                    Message
+                  </label>
+
+                  <span
+                    className="
+                      text-xs
+                      text-muted-dark
+                    "
+                  >
+                    {formData.message.length}/{maxMessageLength}
+                  </span>
+
+                </div>
+
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
                   onChange={handleChange}
                   required
-                  placeholder="you@example.com"
+                  rows={7}
+                  maxLength={maxMessageLength}
+                  placeholder="Tell me about your project, job opportunity, or technical concern..."
                   className="
                     w-full
+                    resize-none
                     rounded-lg
                     border
                     border-border
@@ -486,205 +768,164 @@ const Contact = ({ personalData }) => {
                     px-4
                     py-3
                     text-sm
+                    leading-6
                     text-text
                     outline-none
                     transition-all
                     placeholder:text-muted-dark
                     focus:border-primary
-                    focus:ring-1
-                    focus:ring-primary
+                    focus:ring-2
+                    focus:ring-primary/20
                   "
                 />
 
               </div>
 
-            </div>
+
+              {/* =================================
+                  STATUS
+              ================================= */}
+
+              {status === "success" && (
+
+                <div
+                  role="status"
+                  className="
+                    mt-5
+                    rounded-lg
+                    border
+                    border-success/30
+                    bg-success/10
+                    px-4
+                    py-3
+                    text-sm
+                    text-success
+                  "
+                >
+                  ✓ Message sent successfully. I'll get back
+                  to you as soon as possible.
+                </div>
+
+              )}
 
 
-            {/* SUBJECT */}
+              {status === "error" && (
 
-            <div className="mt-5">
+                <div
+                  role="alert"
+                  className="
+                    mt-5
+                    rounded-lg
+                    border
+                    border-danger/30
+                    bg-danger/10
+                    px-4
+                    py-3
+                    text-sm
+                    text-danger
+                  "
+                >
+                  ✕ Unable to send your message right now.
+                  Please try again or contact me directly by email.
+                </div>
 
-              <label
-                htmlFor="subject"
+              )}
+
+
+              {/* =================================
+                  SUBMIT BUTTON
+              ================================= */}
+
+              <button
+                type="submit"
+                disabled={sending}
                 className="
-                  mb-2
-                  block
-                  text-sm
-                  font-medium
-                  text-text
-                "
-              >
-                Subject
-              </label>
-
-              <input
-                id="subject"
-                name="subject"
-                type="text"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                placeholder="Project inquiry"
-                className="
+                  mt-6
+                  inline-flex
                   w-full
+                  items-center
+                  justify-center
+                  gap-2
                   rounded-lg
-                  border
-                  border-border
-                  bg-input
-                  px-4
-                  py-3
+                  bg-gradient-primary
+                  px-7
+                  py-3.5
                   text-sm
+                  font-semibold
                   text-text
-                  outline-none
+                  shadow-primary
                   transition-all
-                  placeholder:text-muted-dark
-                  focus:border-primary
-                  focus:ring-1
-                  focus:ring-primary
-                "
-              />
-
-            </div>
-
-
-            {/* MESSAGE */}
-
-            <div className="mt-5">
-
-              <label
-                htmlFor="message"
-                className="
-                  mb-2
-                  block
-                  text-sm
-                  font-medium
-                  text-text
+                  duration-300
+                  hover:-translate-y-1
+                  hover:shadow-primary-lg
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
+                  disabled:hover:translate-y-0
                 "
               >
-                Message
-              </label>
 
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows={6}
-                placeholder="Tell me about your project..."
-                className="
-                  w-full
-                  resize-none
-                  rounded-lg
-                  border
-                  border-border
-                  bg-input
-                  px-4
-                  py-3
-                  text-sm
-                  text-text
-                  outline-none
-                  transition-all
-                  placeholder:text-muted-dark
-                  focus:border-primary
-                  focus:ring-1
-                  focus:ring-primary
-                "
-              />
+                {sending ? (
+                  <>
+                    <span
+                      className="
+                        h-4
+                        w-4
+                        animate-spin
+                        rounded-full
+                        border-2
+                        border-text/30
+                        border-t-text
+                      "
+                    />
 
-            </div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    Send Message
+                    <span>→</span>
+                  </>
+                )}
 
+              </button>
 
-            {/* STATUS */}
+            </form>
 
-            {status === "success" && (
-
-              <div
-                className="
-                  mt-5
-                  rounded-lg
-                  border
-                  border-success/30
-                  bg-success/10
-                  px-4
-                  py-3
-                  text-sm
-                  text-success
-                "
-              >
-                ✓ Message sent successfully! I'll get back to you soon.
-              </div>
-
-            )}
-
-
-            {status === "error" && (
-
-              <div
-                className="
-                  mt-5
-                  rounded-lg
-                  border
-                  border-danger/30
-                  bg-danger/10
-                  px-4
-                  py-3
-                  text-sm
-                  text-danger
-                "
-              >
-                ✕ Something went wrong. Please try again.
-              </div>
-
-            )}
-
-
-            {/* SUBMIT */}
-
-            <button
-              type="submit"
-              disabled={sending}
-              className="
-                mt-6
-                inline-flex
-                w-full
-                items-center
-                justify-center
-                rounded-lg
-                bg-gradient-primary
-                px-7
-                py-3
-                text-sm
-                font-semibold
-                text-text
-                shadow-primary
-                transition-all
-                duration-300
-                hover:-translate-y-1
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-              "
-            >
-              {sending ? "Sending..." : "Send Message →"}
-            </button>
-
-          </form>
+          </motion.div>
 
 
           {/* =====================================
-              CALENDLY
+              BOOKING
           ===================================== */}
 
-          <div
+          <motion.div
             className="
               overflow-hidden
               rounded-2xl
               border
               border-border
               bg-card
+              shadow-card
             "
+            initial={{
+              opacity: 0,
+              x: 25,
+            }}
+            whileInView={{
+              opacity: 1,
+              x: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.1,
+            }}
+            transition={{
+              duration: 0.6,
+              delay: 0.1,
+            }}
           >
+
+            {/* BOOKING HEADER */}
 
             <div
               className="
@@ -695,58 +936,99 @@ const Contact = ({ personalData }) => {
               "
             >
 
-              <div className="flex items-center gap-3">
+              <div
+                className="
+                  flex
+                  items-start
+                  justify-between
+                  gap-4
+                "
+              >
 
-                <div
-                  className="
-                    flex
-                    h-11
-                    w-11
-                    items-center
-                    justify-center
-                    rounded-xl
-                    border
-                    border-accent/30
-                    bg-accent/10
-                    text-xl
-                  "
-                >
-                  📅
-                </div>
+                <div className="flex items-start gap-4">
 
-                <div>
-
-                  <h3
+                  <div
                     className="
-                      text-xl
-                      font-bold
-                      text-text
+                      flex
+                      h-11
+                      w-11
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-xl
+                      bg-accent/10
+                      text-lg
                     "
                   >
-                    {personalData.booking?.title ||
-                      "Book a Meeting"}
-                  </h3>
+                    📅
+                  </div>
 
-                  <p className="text-sm text-muted">
-                    {personalData.booking?.meetingDuration ||
-                      "Choose a convenient time"}
-                  </p>
+                  <div>
+
+                    <p
+                      className="
+                        text-xs
+                        font-semibold
+                        uppercase
+                        tracking-[1.5px]
+                        text-accent
+                      "
+                    >
+                      Schedule a Call
+                    </p>
+
+                    <h3
+                      className="
+                        mt-1
+                        text-xl
+                        font-bold
+                        text-text
+                      "
+                    >
+                      {booking.title || "Book a Meeting"}
+                    </h3>
+
+                    <p
+                      className="
+                        mt-1.5
+                        text-sm
+                        text-muted
+                      "
+                    >
+                      {booking.meetingDuration ||
+                        "Choose a convenient time"}
+                    </p>
+
+                  </div>
 
                 </div>
 
               </div>
 
+
+              <p
+                className="
+                  mt-5
+                  text-sm
+                  leading-6
+                  text-muted
+                "
+              >
+                {booking.description ||
+                  "Choose a convenient date and time for us to discuss a project or opportunity."}
+              </p>
+
             </div>
 
 
-            {/* CALENDLY WIDGET */}
+            {/* CALENDLY */}
 
-            <div className="px-2 pb-2 sm:px-4">
+            <div className="bg-bg-secondary">
 
-              {personalData.booking?.calendarUrl ? (
+              {booking.enabled && booking.calendarUrl ? (
 
                 <InlineWidget
-                  url={personalData.booking.calendarUrl}
+                  url={booking.calendarUrl}
                   styles={{
                     height: "650px",
                     width: "100%",
@@ -761,24 +1043,59 @@ const Contact = ({ personalData }) => {
                     h-[650px]
                     items-center
                     justify-center
-                    p-6
+                    p-8
                     text-center
                   "
                 >
 
                   <div>
 
-                    <div className="mb-3 text-4xl">
+                    <div className="mb-4 text-4xl">
                       📅
                     </div>
 
-                    <h4 className="font-semibold text-text">
+                    <h4
+                      className="
+                        text-lg
+                        font-semibold
+                        text-text
+                      "
+                    >
                       Calendar Coming Soon
                     </h4>
 
-                    <p className="mt-2 text-sm text-muted">
-                      The meeting calendar has not been configured yet.
+                    <p
+                      className="
+                        mx-auto
+                        mt-2
+                        max-w-sm
+                        text-sm
+                        leading-6
+                        text-muted
+                      "
+                    >
+                      The meeting calendar is currently
+                      unavailable. Please contact me directly
+                      by email.
                     </p>
+
+                    <a
+                      href={`mailto:${contact.email}`}
+                      className="
+                        mt-5
+                        inline-flex
+                        items-center
+                        rounded-lg
+                        bg-gradient-primary
+                        px-5
+                        py-2.5
+                        text-sm
+                        font-semibold
+                        text-text
+                      "
+                    >
+                      Email Me →
+                    </a>
 
                   </div>
 
@@ -788,9 +1105,70 @@ const Contact = ({ personalData }) => {
 
             </div>
 
-          </div>
+          </motion.div>
 
         </div>
+
+
+        {/* =====================================
+            FINAL CTA
+        ===================================== */}
+
+        <motion.div
+          className="
+            mt-8
+            text-center
+          "
+          initial={{
+            opacity: 0,
+            y: 15,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.5,
+          }}
+        >
+
+          <p
+            className="
+              text-sm
+              text-muted
+            "
+          >
+            Prefer a quick conversation?
+          </p>
+
+          {booking.calendarUrl && booking.enabled && (
+
+            <a
+              href={booking.calendarUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                mt-2
+                inline-flex
+                items-center
+                gap-2
+                text-sm
+                font-semibold
+                text-primary
+                transition-colors
+                hover:text-accent
+              "
+            >
+              Schedule a meeting
+              <span>→</span>
+            </a>
+
+          )}
+
+        </motion.div>
 
       </div>
     </section>

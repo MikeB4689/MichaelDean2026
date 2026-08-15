@@ -1,92 +1,495 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 
-const Services = ({ personalData }) => {
-  const services = personalData.services;
+/* =========================================================
+   SERVICE ICONS
+========================================================= */
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+const serviceIcons = {
+  "Web Development": "</>",
+  "IT Support": "IT",
+  "Virtual Assistance": "VA",
+  "Technical Support": "TS",
+  "Mobile Development": "APP",
+  "Data & Backend": "DB",
+};
 
-  /*
-   * Clone cards at both ends.
-   * This allows the slider to continue moving
-   * and then reset invisibly.
-   */
-  const slides = [
-    ...services.slice(-3),
-    ...services,
-    ...services.slice(0, 3),
-  ];
+/* =========================================================
+   DEFAULT SERVICES
+========================================================= */
 
-  const nextSlide = () => {
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev + 1);
+const defaultServices = [
+  {
+    title: "Web Development",
+    description:
+      "Building responsive, modern, and user-friendly websites and web applications using current web technologies.",
+    category: "Development",
+  },
+  {
+    title: "IT Support",
+    description:
+      "Hardware, software, networking, printer, workstation, and general technical troubleshooting for reliable IT operations.",
+    category: "IT Services",
+  },
+  {
+    title: "Virtual Assistance",
+    description:
+      "Providing reliable remote support including data entry, online research, product research, and administrative tasks.",
+    category: "Business Support",
+  },
+  {
+    title: "Technical Support",
+    description:
+      "Helping users troubleshoot technical issues, resolve problems efficiently, and maintain a positive support experience.",
+    category: "Customer Support",
+  },
+  {
+    title: "Mobile Development",
+    description:
+      "Creating practical mobile applications with React Native and Expo for Android and cross-platform environments.",
+    category: "Mobile",
+  },
+  {
+    title: "Data & Backend",
+    description:
+      "Working with APIs, databases, Firebase, SQLite, PHP, Python, and application data management.",
+    category: "Backend",
+  },
+];
+
+/* =========================================================
+   SERVICE CARD
+========================================================= */
+
+const ServiceCard = ({
+  service,
+  index,
+}) => {
+  const cardRef = useRef(null);
+
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+
+  /* =======================================================
+     3D ROTATION
+  ======================================================= */
+
+  const rotateX = useSpring(
+    useTransform(
+      mouseY,
+      [0, 1],
+      [6, -6]
+    ),
+    {
+      stiffness: 300,
+      damping: 25,
+      mass: 0.5,
+    }
+  );
+
+  const rotateY = useSpring(
+    useTransform(
+      mouseX,
+      [0, 1],
+      [-6, 6]
+    ),
+    {
+      stiffness: 300,
+      damping: 25,
+      mass: 0.5,
+    }
+  );
+
+  /* =======================================================
+     CURSOR GLOW POSITION
+  ======================================================= */
+
+  const glowX = useTransform(
+    mouseX,
+    [0, 1],
+    ["0%", "100%"]
+  );
+
+  const glowY = useTransform(
+    mouseY,
+    [0, 1],
+    ["0%", "100%"]
+  );
+
+  /* =======================================================
+     MOUSE MOVE
+  ======================================================= */
+
+  const handleMouseMove = (event) => {
+    if (!cardRef.current) return;
+
+    const rect =
+      cardRef.current.getBoundingClientRect();
+
+    const x =
+      (event.clientX - rect.left) /
+      rect.width;
+
+    const y =
+      (event.clientY - rect.top) /
+      rect.height;
+
+    mouseX.set(x);
+    mouseY.set(y);
   };
 
-  const prevSlide = () => {
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev - 1);
+  /* =======================================================
+     RESET
+  ======================================================= */
+
+  const handleMouseLeave = () => {
+    mouseX.set(0.5);
+    mouseY.set(0.5);
   };
 
-  /*
-   * Start in the real first card.
-   */
-  useEffect(() => {
-    setCurrentIndex(3);
-  }, []);
+  const icon =
+    service.icon ||
+    serviceIcons[service.title] ||
+    "</>";
 
-  /*
-   * When reaching a cloned card,
-   * instantly move back to the real card.
-   */
-  useEffect(() => {
-    if (currentIndex === services.length + 3) {
-      const timeout = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndex(3);
-      }, 500);
+  return (
+    <div
+      className="h-full"
+      style={{
+        perspective: "1200px",
+      }}
+    >
+      <motion.article
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+        }}
+        whileHover={{
+          y: -8,
+          scale: 1.015,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 22,
+        }}
+        className="
+          group
+          relative
+          flex
+          h-full
+          min-h-[330px]
+          flex-col
+          overflow-hidden
+          rounded-2xl
+          border
+          border-border
+          bg-card
+          p-6
+          shadow-card
+          transition-shadow
+          duration-300
+          hover:border-primary/60
+          hover:shadow-primary
+          sm:p-7
+        "
+      >
+        {/* =================================================
+            CURSOR GLOW
+        ================================================= */}
 
-      return () => clearTimeout(timeout);
-    }
+        <motion.div
+          className="
+            pointer-events-none
+            absolute
+            -translate-x-1/2
+            -translate-y-1/2
+            h-44
+            w-44
+            rounded-full
+            bg-primary/10
+            blur-3xl
+            opacity-0
+            transition-opacity
+            duration-300
+            group-hover:opacity-100
+          "
+          style={{
+            left: glowX,
+            top: glowY,
+          }}
+        />
 
-    if (currentIndex === 0) {
-      const timeout = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndex(services.length);
-      }, 500);
+        {/* =================================================
+            TOP GLOW
+        ================================================= */}
 
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, services.length]);
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -right-20
+            -top-20
+            h-40
+            w-40
+            rounded-full
+            bg-primary/5
+            blur-3xl
+            transition-all
+            duration-500
+            group-hover:bg-primary/15
+          "
+        />
 
-  /*
-   * Re-enable animation after an instant reset.
-   */
-  useEffect(() => {
-    if (!isTransitioning) {
-      const timeout = setTimeout(() => {
-        setIsTransitioning(true);
-      }, 50);
+        {/* =================================================
+            SERVICE NUMBER
+        ================================================= */}
 
-      return () => clearTimeout(timeout);
-    }
-  }, [isTransitioning]);
+        <div
+          className="
+            relative
+            z-10
+            flex
+            items-center
+            justify-between
+          "
+          style={{
+            transform:
+              "translateZ(25px)",
+          }}
+        >
+          <span
+            className="
+              text-xs
+              font-bold
+              tracking-[2px]
+              text-primary
+            "
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
 
-  /*
-   * Automatic sliding.
-   */
-  useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
+          {service.category && (
+            <span
+              className="
+                rounded-full
+                border
+                border-border
+                bg-bg
+                px-3
+                py-1
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-wider
+                text-muted
+              "
+            >
+              {service.category}
+            </span>
+          )}
+        </div>
 
-    return () => clearInterval(interval);
-  }, []);
+        {/* =================================================
+            ICON
+        ================================================= */}
 
-  /*
-   * Calculate which card is active for the dots.
-   */
-  const activeIndex =
-    (currentIndex - 3 + services.length) % services.length;
+        <motion.div
+          className="
+            relative
+            z-10
+            mt-7
+            flex
+            h-14
+            w-14
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-primary/20
+            bg-primary/10
+            font-mono
+            text-sm
+            font-bold
+            text-primary
+          "
+          style={{
+            transform:
+              "translateZ(35px)",
+          }}
+          whileHover={{
+            rotate: -5,
+            scale: 1.08,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 15,
+          }}
+        >
+          {icon}
+        </motion.div>
+
+        {/* =================================================
+            TITLE
+        ================================================= */}
+
+        <h3
+          className="
+            relative
+            z-10
+            mt-6
+            text-xl
+            font-bold
+            text-text
+            transition-colors
+            duration-300
+            group-hover:text-primary
+          "
+          style={{
+            transform:
+              "translateZ(30px)",
+          }}
+        >
+          {service.title}
+        </h3>
+
+        {/* =================================================
+            DESCRIPTION
+        ================================================= */}
+
+        <p
+          className="
+            relative
+            z-10
+            mt-3
+            flex-1
+            text-sm
+            leading-6
+            text-muted
+          "
+          style={{
+            transform:
+              "translateZ(20px)",
+          }}
+        >
+          {service.description}
+        </p>
+
+        {/* =================================================
+            BOTTOM LINK
+        ================================================= */}
+
+        <div
+          className="
+            relative
+            z-10
+            mt-6
+            flex
+            items-center
+            justify-between
+            border-t
+            border-border
+            pt-5
+          "
+          style={{
+            transform:
+              "translateZ(25px)",
+          }}
+        >
+          <span
+            className="
+              text-xs
+              font-semibold
+              uppercase
+              tracking-wider
+              text-muted
+              transition-colors
+              duration-300
+              group-hover:text-primary
+            "
+          >
+            Learn More
+          </span>
+
+          <motion.span
+            className="
+              text-lg
+              text-primary
+            "
+            animate={{
+              x: [0, 0],
+            }}
+            whileHover={{
+              x: 4,
+            }}
+          >
+            →
+          </motion.span>
+        </div>
+
+        {/* =================================================
+            HOVER ACCENT
+        ================================================= */}
+
+        <div
+          className="
+            absolute
+            bottom-0
+            left-0
+            h-1
+            w-12
+            rounded-r-full
+            bg-gradient-primary
+            transition-all
+            duration-500
+            group-hover:w-full
+          "
+        />
+
+        {/* =================================================
+            INNER HIGHLIGHT
+        ================================================= */}
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            rounded-2xl
+            border
+            border-white/5
+            opacity-0
+            transition-opacity
+            duration-300
+            group-hover:opacity-100
+          "
+        />
+      </motion.article>
+    </div>
+  );
+};
+
+/* =========================================================
+   SERVICES
+========================================================= */
+
+const Services = ({
+  personalData,
+}) => {
+  const services =
+    personalData?.services?.length > 0
+      ? personalData.services
+      : defaultServices;
 
   return (
     <section
@@ -103,17 +506,94 @@ const Services = ({ personalData }) => {
         lg:py-32
       "
     >
-      <div className="mx-auto w-full max-w-content">
+      {/* =====================================================
+          BACKGROUND GLOW
+      ===================================================== */}
 
-        {/* =====================================
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -left-48
+          top-20
+          h-[400px]
+          w-[400px]
+          rounded-full
+          bg-glow-blue
+          opacity-20
+          blur-3xl
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -right-48
+          bottom-20
+          h-[400px]
+          w-[400px]
+          rounded-full
+          bg-glow-purple
+          opacity-20
+          blur-3xl
+        "
+      />
+
+      {/* =====================================================
+          CONTAINER
+      ===================================================== */}
+
+      <div
+        className="
+          relative
+          z-10
+          mx-auto
+          w-full
+          max-w-content
+        "
+      >
+        {/* ===================================================
             HEADER
-        ===================================== */}
+        =================================================== */}
 
-        <div className="mb-12">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 25,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.2,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
+          className="
+            mb-12
+            max-w-3xl
+          "
+        >
+          {/* LABEL */}
 
-          <div className="flex items-center gap-3">
-
-            <span className="h-px w-10 bg-primary" />
+          <div
+            className="
+              flex
+              items-center
+              gap-3
+            "
+          >
+            <span
+              className="
+                h-px
+                w-10
+                bg-primary
+              "
+            />
 
             <p
               className="
@@ -126,445 +606,185 @@ const Services = ({ personalData }) => {
             >
               What I Do
             </p>
-
           </div>
+
+          {/* TITLE */}
 
           <h2
             className="
               mt-4
               text-4xl
               font-bold
+              tracking-tight
               text-text
               sm:text-5xl
             "
           >
-            My
-            <span className="text-primary"> Services</span>
+            Services &{" "}
+            <span className="text-primary">
+              Solutions
+            </span>
           </h2>
+
+          {/* DESCRIPTION */}
 
           <p
             className="
               mt-4
-              max-w-text
+              max-w-2xl
               text-sm
               leading-7
               text-muted
               sm:text-base
             "
           >
-            I provide technical, development, and support services
-            focused on creating reliable and practical solutions.
+            I provide practical technology solutions
+            combining web development, IT support,
+            technical troubleshooting, and remote
+            business assistance.
           </p>
+        </motion.div>
 
-        </div>
+        {/* ===================================================
+            SERVICES GRID
+        =================================================== */}
 
-
-        {/* =====================================
-            SLIDER
-        ===================================== */}
-
-        <div className="relative">
-
-          {/* Previous */}
-
-          <button
-            type="button"
-            onClick={prevSlide}
-            aria-label="Previous service"
-            className="
-              absolute
-              left-0
-              top-1/2
-              z-20
-              hidden
-              h-11
-              w-11
-              -translate-x-1/2
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-border
-              bg-bg-secondary
-              text-xl
-              text-primary
-              shadow-card
-              transition-all
-              duration-300
-              hover:border-primary
-              hover:bg-primary
-              hover:text-bg
-              lg:flex
-            "
-          >
-            ←
-          </button>
-
-
-          {/* Cards */}
-
-          <div className="overflow-hidden">
-
-            <div
-              className={`
-                flex
-                ${
-                  isTransitioning
-                    ? "transition-transform duration-500 ease-out"
-                    : ""
+        <div
+          className="
+            grid
+            gap-5
+            sm:grid-cols-2
+            xl:grid-cols-3
+          "
+        >
+          {services.map(
+            (service, index) => (
+              <motion.div
+                key={
+                  service.id ||
+                  service.title ||
+                  index
                 }
-              `}
-              style={{
-                transform: `translateX(calc(-${currentIndex * 100}% / 3))`,
-              }}
+                initial={{
+                  opacity: 0,
+                  y: 30,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                viewport={{
+                  once: true,
+                  amount: 0.15,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.08,
+                }}
+              >
+                <ServiceCard
+                  service={service}
+                  index={index}
+                />
+              </motion.div>
+            )
+          )}
+        </div>
+
+        {/* ===================================================
+            BOTTOM CTA
+        =================================================== */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 25,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.2,
+          }}
+          transition={{
+            duration: 0.6,
+            delay: 0.15,
+          }}
+          className="
+            mt-10
+            flex
+            flex-col
+            gap-5
+            rounded-2xl
+            border
+            border-primary/30
+            bg-primary/5
+            p-6
+            sm:p-8
+            lg:flex-row
+            lg:items-center
+            lg:justify-between
+          "
+        >
+          <div>
+            <p
+              className="
+                text-lg
+                font-semibold
+                text-text
+              "
             >
+              Have a project or technical problem?
+            </p>
 
-              {slides.map((service, index) => (
-
-                <div
-                  key={`${service.title}-${index}`}
-                  className="
-                    w-full
-                    shrink-0
-                    px-2
-                    sm:w-1/2
-                    lg:w-1/3
-                  "
-                >
-
-                  <article
-                    className="
-                      group
-                      relative
-                      h-full
-                      min-h-[320px]
-                      overflow-hidden
-                      rounded-2xl
-                      border
-                      border-border
-                      bg-card
-                      p-6
-                      transition-all
-                      duration-300
-                      hover:-translate-y-2
-                      hover:border-primary/60
-                      hover:shadow-primary
-                      sm:p-7
-                    "
-                  >
-
-                    {/* Top gradient */}
-
-                    <div
-                      className="
-                        absolute
-                        left-0
-                        right-0
-                        top-0
-                        h-1
-                        bg-gradient-primary
-                        opacity-40
-                        transition-opacity
-                        duration-300
-                        group-hover:opacity-100
-                      "
-                    />
-
-
-                    {/* Number */}
-
-                    <div
-                      className="
-                        absolute
-                        right-5
-                        top-5
-                        text-sm
-                        font-bold
-                        text-muted-dark
-                        transition-colors
-                        duration-300
-                        group-hover:text-primary
-                      "
-                    >
-                      {String((index % services.length) + 1).padStart(
-                        2,
-                        "0"
-                      )}
-                    </div>
-
-
-                    {/* Icon */}
-
-                    <div
-                      className="
-                        flex
-                        h-14
-                        w-14
-                        items-center
-                        justify-center
-                        rounded-xl
-                        border
-                        border-border
-                        bg-bg-secondary
-                        text-xl
-                        text-primary
-                        transition-all
-                        duration-300
-                        group-hover:border-primary
-                        group-hover:shadow-primary
-                      "
-                    >
-                      {getServiceIcon(service.title)}
-                    </div>
-
-
-                    {/* Title */}
-
-                    <h3
-                      className="
-                        mt-7
-                        text-xl
-                        font-bold
-                        text-text
-                        transition-colors
-                        duration-300
-                        group-hover:text-primary
-                      "
-                    >
-                      {service.title}
-                    </h3>
-
-
-                    {/* Description */}
-
-                    <p
-                      className="
-                        mt-4
-                        text-sm
-                        leading-7
-                        text-muted
-                      "
-                    >
-                      {service.description}
-                    </p>
-
-
-                    {/* Bottom */}
-
-                    <div
-                      className="
-                        absolute
-                        bottom-6
-                        left-6
-                        right-6
-                        flex
-                        items-center
-                        justify-between
-                        border-t
-                        border-border
-                        pt-4
-                      "
-                    >
-
-                      <span
-                        className="
-                          text-[10px]
-                          font-medium
-                          uppercase
-                          tracking-[2px]
-                          text-muted-dark
-                        "
-                      >
-                        Service
-                      </span>
-
-                      <span
-                        className="
-                          text-lg
-                          text-primary
-                          transition-transform
-                          duration-300
-                          group-hover:translate-x-1
-                        "
-                      >
-                        →
-                      </span>
-
-                    </div>
-
-                  </article>
-
-                </div>
-
-              ))}
-
-            </div>
-
+            <p
+              className="
+                mt-2
+                max-w-2xl
+                text-sm
+                leading-6
+                text-muted
+              "
+            >
+              Let's discuss your requirements and
+              find a practical solution that fits
+              your goals.
+            </p>
           </div>
 
-
-          {/* Next */}
-
-          <button
-            type="button"
-            onClick={nextSlide}
-            aria-label="Next service"
+          <a
+            href="#contact"
             className="
-              absolute
-              right-0
-              top-1/2
-              z-20
-              hidden
-              h-11
-              w-11
-              translate-x-1/2
-              -translate-y-1/2
+              inline-flex
+              shrink-0
               items-center
               justify-center
-              rounded-full
-              border
-              border-border
-              bg-bg-secondary
-              text-xl
-              text-primary
-              shadow-card
+              rounded-xl
+              bg-gradient-primary
+              px-6
+              py-3
+              text-sm
+              font-semibold
+              text-text
+              shadow-primary
               transition-all
               duration-300
-              hover:border-primary
-              hover:bg-primary
-              hover:text-bg
-              lg:flex
+              hover:-translate-y-1
+              hover:shadow-primary-lg
             "
           >
-            →
-          </button>
+            Let's Work Together
 
-        </div>
-
-
-        {/* =====================================
-            MOBILE CONTROLS
-        ===================================== */}
-
-        <div className="mt-6 flex items-center justify-center gap-4">
-
-          {/* Previous */}
-
-          <button
-            type="button"
-            onClick={prevSlide}
-            className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-border
-              bg-bg-secondary
-              text-primary
-              transition-all
-              hover:border-primary
-              hover:bg-primary
-              hover:text-bg
-            "
-          >
-            ←
-          </button>
-
-
-          {/* Dots */}
-
-          <div className="flex items-center gap-2">
-
-            {services.map((_, index) => (
-
-              <button
-                key={index}
-                type="button"
-                onClick={() => {
-                  setIsTransitioning(true);
-                  setCurrentIndex(index + 3);
-                }}
-                aria-label={`Go to service ${index + 1}`}
-                className={`
-                  h-2
-                  rounded-full
-                  transition-all
-                  duration-300
-                  ${
-                    activeIndex === index
-                      ? "w-6 bg-primary"
-                      : "w-2 bg-border"
-                  }
-                `}
-              />
-
-            ))}
-
-          </div>
-
-
-          {/* Next */}
-
-          <button
-            type="button"
-            onClick={nextSlide}
-            className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-full
-              border
-              border-border
-              bg-bg-secondary
-              text-primary
-              transition-all
-              hover:border-primary
-              hover:bg-primary
-              hover:text-bg
-            "
-          >
-            →
-          </button>
-
-        </div>
-
+            <span className="ml-2">
+              →
+            </span>
+          </a>
+        </motion.div>
       </div>
     </section>
   );
 };
-
-
-/* ========================================
-   SERVICE ICONS
-======================================== */
-
-const getServiceIcon = (title) => {
-  switch (title) {
-    case "IT Support":
-      return "🖥️";
-
-    case "Web Development":
-      return "</>";
-
-    case "Mobile App Development":
-      return "📱";
-
-    case "Virtual Assistance":
-      return "📋";
-
-    case "Technical Support":
-      return "⚙️";
-
-    default:
-      return "✦";
-  }
-};
-
 
 export default Services;
