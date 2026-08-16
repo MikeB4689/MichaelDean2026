@@ -66,10 +66,7 @@ const defaultServices = [
    SERVICE CARD
 ========================================================= */
 
-const ServiceCard = ({
-  service,
-  index,
-}) => {
+const ServiceCard = ({ service, index }) => {
   const cardRef = useRef(null);
 
   const mouseX = useMotionValue(0.5);
@@ -80,11 +77,7 @@ const ServiceCard = ({
   ======================================================= */
 
   const rotateX = useSpring(
-    useTransform(
-      mouseY,
-      [0, 1],
-      [6, -6]
-    ),
+    useTransform(mouseY, [0, 1], [6, -6]),
     {
       stiffness: 300,
       damping: 25,
@@ -93,11 +86,7 @@ const ServiceCard = ({
   );
 
   const rotateY = useSpring(
-    useTransform(
-      mouseX,
-      [0, 1],
-      [-6, 6]
-    ),
+    useTransform(mouseX, [0, 1], [-6, 6]),
     {
       stiffness: 300,
       damping: 25,
@@ -128,16 +117,13 @@ const ServiceCard = ({
   const handleMouseMove = (event) => {
     if (!cardRef.current) return;
 
-    const rect =
-      cardRef.current.getBoundingClientRect();
+    const rect = cardRef.current.getBoundingClientRect();
 
     const x =
-      (event.clientX - rect.left) /
-      rect.width;
+      (event.clientX - rect.left) / rect.width;
 
     const y =
-      (event.clientY - rect.top) /
-      rect.height;
+      (event.clientY - rect.top) / rect.height;
 
     mouseX.set(x);
     mouseY.set(y);
@@ -263,8 +249,7 @@ const ServiceCard = ({
             justify-between
           "
           style={{
-            transform:
-              "translateZ(25px)",
+            transform: "translateZ(25px)",
           }}
         >
           <span
@@ -323,8 +308,7 @@ const ServiceCard = ({
             text-primary
           "
           style={{
-            transform:
-              "translateZ(35px)",
+            transform: "translateZ(35px)",
           }}
           whileHover={{
             rotate: -5,
@@ -356,8 +340,7 @@ const ServiceCard = ({
             group-hover:text-primary
           "
           style={{
-            transform:
-              "translateZ(30px)",
+            transform: "translateZ(30px)",
           }}
         >
           {service.title}
@@ -378,8 +361,7 @@ const ServiceCard = ({
             text-muted
           "
           style={{
-            transform:
-              "translateZ(20px)",
+            transform: "translateZ(20px)",
           }}
         >
           {service.description}
@@ -389,7 +371,9 @@ const ServiceCard = ({
             BOTTOM LINK
         ================================================= */}
 
-        <div
+        <a
+          href="#contact"
+          aria-label={`Learn more about ${service.title}`}
           className="
             relative
             z-10
@@ -400,10 +384,15 @@ const ServiceCard = ({
             border-t
             border-border
             pt-5
+            outline-none
+            focus-visible:rounded-lg
+            focus-visible:ring-2
+            focus-visible:ring-primary
+            focus-visible:ring-offset-2
+            focus-visible:ring-offset-card
           "
           style={{
-            transform:
-              "translateZ(25px)",
+            transform: "translateZ(25px)",
           }}
         >
           <span
@@ -425,17 +414,14 @@ const ServiceCard = ({
             className="
               text-lg
               text-primary
+              transition-transform
+              duration-300
+              group-hover:translate-x-1
             "
-            animate={{
-              x: [0, 0],
-            }}
-            whileHover={{
-              x: 4,
-            }}
           >
             →
           </motion.span>
-        </div>
+        </a>
 
         {/* =================================================
             HOVER ACCENT
@@ -483,9 +469,7 @@ const ServiceCard = ({
    SERVICES
 ========================================================= */
 
-const Services = ({
-  personalData,
-}) => {
+const Services = ({ personalData }) => {
   const services =
     personalData?.services?.length > 0
       ? personalData.services
@@ -657,38 +641,36 @@ const Services = ({
             xl:grid-cols-3
           "
         >
-          {services.map(
-            (service, index) => (
-              <motion.div
-                key={
-                  service.id ||
-                  service.title ||
-                  index
-                }
-                initial={{
-                  opacity: 0,
-                  y: 30,
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                viewport={{
-                  once: true,
-                  amount: 0.15,
-                }}
-                transition={{
-                  duration: 0.5,
-                  delay: index * 0.08,
-                }}
-              >
-                <ServiceCard
-                  service={service}
-                  index={index}
-                />
-              </motion.div>
-            )
-          )}
+          {services.map((service, index) => (
+            <motion.div
+              key={
+                service.id ||
+                service.title ||
+                index
+              }
+              initial={{
+                opacity: 0,
+                y: 30,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.15,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.08,
+              }}
+            >
+              <ServiceCard
+                service={service}
+                index={index}
+              />
+            </motion.div>
+          ))}
         </div>
 
         {/* ===================================================
@@ -773,6 +755,11 @@ const Services = ({
               duration-300
               hover:-translate-y-1
               hover:shadow-primary-lg
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-primary
+              focus-visible:ring-offset-2
+              focus-visible:ring-offset-bg
             "
           >
             Let's Work Together

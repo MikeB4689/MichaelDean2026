@@ -10,7 +10,6 @@ import About from "./components/About";
 import Skills from "./components/Skills";
 import Experience from "./components/Experience";
 import Services from "./components/Services";
- 
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 
@@ -24,12 +23,26 @@ function App() {
       return true;
     }
 
-    const savedTheme = localStorage.getItem("theme");
+    try {
+      const savedTheme = localStorage.getItem("theme");
 
-    if (savedTheme === "light") return false;
-    if (savedTheme === "dark") return true;
+      // Explicit saved preferences remain authoritative.
+      if (savedTheme === "light") {
+        return false;
+      }
 
-    return true;
+      if (savedTheme === "dark") {
+        return true;
+      }
+    } catch {
+      // Storage is unavailable; continue with system preference.
+    }
+
+    // No saved preference:
+    // follow the user's operating system/browser preference.
+    return !window.matchMedia(
+      "(prefers-color-scheme: light)"
+    ).matches;
   });
 
   /* =======================================================
@@ -47,10 +60,14 @@ function App() {
 
     root.classList.toggle("dark", isDark);
 
-    localStorage.setItem(
-      "theme",
-      isDark ? "dark" : "light"
-    );
+    try {
+      localStorage.setItem(
+        "theme",
+        isDark ? "dark" : "light"
+      );
+    } catch {
+      // Storage is unavailable; keep the in-memory theme.
+    }
   }, [isDark]);
 
   /* =======================================================
@@ -119,25 +136,45 @@ function App() {
 
       <main className="w-full">
 
-        {/* HERO */}
+        {/* =================================================
+            HERO
+        ================================================= */}
+
         <Hero personalData={portfolio} />
 
-        {/* ABOUT */}
+        {/* =================================================
+            ABOUT
+        ================================================= */}
+
         <About personalData={portfolio} />
 
-        {/* SKILLS */}
+        {/* =================================================
+            SKILLS
+        ================================================= */}
+
         <Skills personalData={portfolio} />
 
-        {/* EXPERIENCE */}
+        {/* =================================================
+            EXPERIENCE
+        ================================================= */}
+
         <Experience personalData={portfolio} />
 
-        {/* SERVICES */}
+        {/* =================================================
+            SERVICES
+        ================================================= */}
+
         <Services personalData={portfolio} />
 
-        {/* PROJECTS */}
- 
+        {/* =================================================
+            PROJECTS
+            Reserved for future Projects section.
+        ================================================= */}
 
-        {/* CONTACT */}
+        {/* =================================================
+            CONTACT
+        ================================================= */}
+
         <Contact personalData={portfolio} />
 
       </main>

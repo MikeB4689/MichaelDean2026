@@ -146,7 +146,7 @@ const portfolio = {
       image: "/projects/portfolio.jpg",
 
       liveUrl:
-        "https://mikeb4689.github.io/MDCoder/",
+        "https://mikeb4689.github.io/MichaelDean2026/",
 
       githubUrl:
         "https://github.com/MikeB4689",

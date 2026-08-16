@@ -6,7 +6,8 @@ import {
   useTransform,
 } from "framer-motion";
 import resume from "../assets/Michael Resume 2026.pdf";
-import Image from "../assets/profile.png"
+import Image from "../assets/profile.png";
+
 const Hero = ({ personalData }) => {
   const {
     personalInfo = {},
@@ -96,6 +97,25 @@ const Hero = ({ personalData }) => {
     smoothY,
     [-0.5, 0.5],
     [-20, 20]
+  );
+
+  /* =====================================================
+     MOUSE FOLLOW GLOW
+
+     smoothX / smoothY are normalized values from
+     -0.5 to 0.5, so map them to pixel offsets.
+  ===================================================== */
+
+  const glowX = useTransform(
+    smoothX,
+    [-0.5, 0.5],
+    [-260, 260]
+  );
+
+  const glowY = useTransform(
+    smoothY,
+    [-0.5, 0.5],
+    [-180, 180]
   );
 
   /* =====================================================
@@ -229,8 +249,8 @@ const Hero = ({ personalData }) => {
 
       <motion.div
         style={{
-          x: smoothX,
-          y: smoothY,
+          x: glowX,
+          y: glowY,
         }}
         className="
           pointer-events-none
@@ -821,42 +841,57 @@ const Hero = ({ personalData }) => {
               "
             />
 
-            {/* DECORATIVE STAR */}
+            {/* =================================================
+                DECORATIVE STAR
+
+                FIX:
+                decorationY controls the outer element's
+                parallax movement.
+
+                The inner wrapper handles the floating
+                animation so both transforms do not compete
+                for control of the same y property.
+            ================================================= */}
 
             <motion.div
               style={{
                 x: decorationX,
                 y: decorationY,
               }}
-              animate={{
-                y: [0, -10, 0],
-                rotate: [0, 8, 0],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
               className="
                 absolute
                 -right-5
                 -top-5
                 z-30
-                flex
-                h-14
-                w-14
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-primary/60
-                bg-bg
-                text-xl
-                text-primary
-                shadow-primary
               "
             >
-              ✦
+              <motion.div
+                animate={{
+                  y: [0, -10, 0],
+                  rotate: [0, 8, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="
+                  flex
+                  h-14
+                  w-14
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-primary/60
+                  bg-bg
+                  text-xl
+                  text-primary
+                  shadow-primary
+                "
+              >
+                ✦
+              </motion.div>
             </motion.div>
 
             {/* IMAGE FRAME */}
@@ -888,7 +923,11 @@ const Hero = ({ personalData }) => {
               >
                 <img
                   src={Image}
-                  alt={`Professional portrait of ${personalInfo.name}`}
+                  alt={
+                    personalInfo.name
+                      ? `Professional portrait of ${personalInfo.name}`
+                      : "Professional portrait"
+                  }
                   className="
                     h-full
                     w-full

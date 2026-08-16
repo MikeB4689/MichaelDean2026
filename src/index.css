@@ -1,5 +1,4 @@
- 
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+@import "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap";
 
 @import "tailwindcss";
 
@@ -58,6 +57,14 @@
   --color-purple: #5145FF;
   --color-purple-light: #7B2CFF;
   --color-purple-dark: #3B32CC;
+
+
+  /* =========================
+     GLOW COLORS
+  ========================= */
+
+  --color-glow-blue: #08C8FF;
+  --color-glow-purple: #7B2CFF;
 
 
   /* =========================
@@ -463,15 +470,17 @@ section {
    THEME TRANSITIONS
 ========================================================= */
 
+/*
+  Keep theme transitions limited to the actual themed
+  containers. Component-level transition utilities such as
+  transition-all and transition-colors remain responsible
+  for interactive animations.
+*/
+
 body,
 nav,
 section,
-footer,
-button,
-a,
-input,
-textarea,
-select {
+footer {
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
@@ -575,4 +584,3 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
- 

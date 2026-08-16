@@ -1,4 +1,4 @@
-import React, {
+import {
   useEffect,
   useMemo,
   useRef,
@@ -54,7 +54,8 @@ const SkillCard = ({ skill, index }) => {
   const handleMouseMove = (event) => {
     if (!cardRef.current) return;
 
-    const rect = cardRef.current.getBoundingClientRect();
+    const rect =
+      cardRef.current.getBoundingClientRect();
 
     const x =
       (event.clientX - rect.left) / rect.width;
@@ -73,9 +74,13 @@ const SkillCard = ({ skill, index }) => {
 
   const rating = Number(skill.rating) || 0;
 
+  /* =========================================================
+     ROUNDED PERCENTAGE
+  ========================================================= */
+
   const percentage = Math.min(
     100,
-    Math.max(0, (rating / 5) * 100)
+    Math.max(0, Math.round((rating / 5) * 100))
   );
 
   return (
@@ -459,14 +464,16 @@ const Skills = ({ personalData }) => {
   }, [skills.length, visibleCards]);
 
   /* =======================================================
-     KEEP INDEX VALID
+     ACTIVE INDEX
+     
+     Derive the safe slider position during render instead
+     of updating state inside an effect.
   ======================================================= */
 
-  useEffect(() => {
-    setCurrentIndex((prev) =>
-      Math.min(prev, maxIndex)
-    );
-  }, [maxIndex]);
+  const activeIndex = Math.min(
+    currentIndex,
+    maxIndex
+  );
 
   /* =======================================================
      NEXT
@@ -776,7 +783,7 @@ const Skills = ({ personalData }) => {
             className="flex"
             animate={{
               x: `-${
-                currentIndex *
+                activeIndex *
                 (100 / visibleCards)
               }%`,
             }}
@@ -827,7 +834,7 @@ const Skills = ({ personalData }) => {
                   transition-all
                   duration-300
                   ${
-                    currentIndex === index
+                    activeIndex === index
                       ? "w-8 bg-primary"
                       : "w-2 bg-border hover:bg-primary/50"
                   }

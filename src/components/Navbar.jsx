@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import resume from "../assets/Michael Resume 2026.pdf";
 
+const NAVBAR_OFFSET = 100;
+
 const navbarButtons = [
   {
     id: "home",
@@ -18,10 +20,6 @@ const navbarButtons = [
   {
     id: "experience",
     label: "Experience",
-  },
-  {
-    id: "projects",
-    label: "Project",
   },
   {
     id: "services",
@@ -42,14 +40,18 @@ const Navbar = ({ isDark, toggleTheme }) => {
   // =====================================
 
   useEffect(() => {
-    const sections = navbarButtons
-      .map(({ id }) => document.getElementById(id))
-      .filter(Boolean);
-
-    if (!sections.length) return;
-
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 140;
+      const sections = navbarButtons
+        .map(({ id }) => document.getElementById(id))
+        .filter(Boolean);
+
+      if (!sections.length) {
+        setActiveSection("home");
+        return;
+      }
+
+      const scrollPosition =
+        window.scrollY + NAVBAR_OFFSET;
 
       let currentSection = "home";
 
@@ -75,7 +77,10 @@ const Navbar = ({ isDark, toggleTheme }) => {
     });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
     };
   }, []);
 
@@ -150,26 +155,16 @@ const Navbar = ({ isDark, toggleTheme }) => {
 
     // Give React/browser time to close menu
     requestAnimationFrame(() => {
-      const navbarOffset = 100;
-
       const sectionPosition =
         section.getBoundingClientRect().top +
         window.scrollY -
-        navbarOffset;
+        NAVBAR_OFFSET;
 
       window.scrollTo({
         top: Math.max(0, sectionPosition),
         behavior: "smooth",
       });
     });
-  };
-
-  // =====================================
-  // THEME TOGGLE
-  // =====================================
-
-  const handleThemeToggle = () => {
-    toggleTheme();
   };
 
   return (
@@ -359,7 +354,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
 
             <ThemeToggle
               isDark={isDark}
-              onToggle={handleThemeToggle}
+              onToggle={toggleTheme}
             />
 
             {/* CV */}
@@ -391,6 +386,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
               "
             >
               CV
+
               <span className="ml-1.5">
                 ↓
               </span>
@@ -411,7 +407,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
           >
             <ThemeToggle
               isDark={isDark}
-              onToggle={handleThemeToggle}
+              onToggle={toggleTheme}
             />
 
             <motion.button
@@ -687,6 +683,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
                   "
                 >
                   Download My CV
+
                   <span className="ml-2">
                     ↓
                   </span>
@@ -729,7 +726,6 @@ const Navbar = ({ isDark, toggleTheme }) => {
     </>
   );
 };
-
 
 // =====================================
 // THEME TOGGLE

@@ -3,6 +3,18 @@ import emailjs from "@emailjs/browser";
 import { InlineWidget } from "react-calendly";
 import { motion } from "framer-motion";
 
+/* =========================================================
+   EMAILJS CONFIG
+========================================================= */
+
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+/* =========================================================
+   CONTACT COMPONENT
+========================================================= */
+
 const Contact = ({ personalData }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -14,11 +26,23 @@ const Contact = ({ personalData }) => {
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
 
-  const contact = personalData.contact || {};
-  const booking = personalData.booking || {};
-  const personalInfo = personalData.personalInfo || {};
+  const contact = personalData?.contact || {};
+  const booking = personalData?.booking || {};
+  const personalInfo = personalData?.personalInfo || {};
 
   const maxMessageLength = 1000;
+
+  /* =========================================================
+     BOOKING AVAILABILITY
+  ========================================================= */
+
+  const bookingAvailable = Boolean(
+    booking.enabled && booking.calendarUrl
+  );
+
+  /* =========================================================
+     HANDLE INPUT
+  ========================================================= */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,27 +60,102 @@ const Contact = ({ personalData }) => {
     }
   };
 
+  /* =========================================================
+     HANDLE SUBMIT
+  ========================================================= */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (sending) return;
 
+    /* -------------------------------------------------------
+       CHECK EMAILJS CONFIGURATION
+    ------------------------------------------------------- */
+
+    if (
+      !EMAILJS_SERVICE_ID ||
+      !EMAILJS_TEMPLATE_ID ||
+      !EMAILJS_PUBLIC_KEY
+    ) {
+      console.error("❌ EmailJS configuration is missing.");
+
+      console.error({
+        serviceId: EMAILJS_SERVICE_ID || "MISSING",
+        templateId: EMAILJS_TEMPLATE_ID || "MISSING",
+        publicKey: EMAILJS_PUBLIC_KEY ? "Loaded" : "MISSING",
+      });
+
+      setStatus("config-error");
+      return;
+    }
+
+    /* -------------------------------------------------------
+       VALIDATE FORM
+    ------------------------------------------------------- */
+
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.subject.trim() ||
+      !formData.message.trim()
+    ) {
+      setStatus("validation-error");
+      return;
+    }
+
     setSending(true);
     setStatus("");
 
+    /* -------------------------------------------------------
+       EMAILJS TEMPLATE PARAMETERS
+    ------------------------------------------------------- */
+
+    const templateParams = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+
+      // Use this in EmailJS as {{reply_to}}
+      reply_to: formData.email.trim(),
+    };
+
+    console.log("====================================");
+    console.log("📧 EMAILJS SEND");
+    console.log("====================================");
+    console.log("Service ID:", EMAILJS_SERVICE_ID);
+    console.log("Template ID:", EMAILJS_TEMPLATE_ID);
+    console.log(
+      "Public Key:",
+      EMAILJS_PUBLIC_KEY ? "Loaded" : "Missing"
+    );
+    console.log("Template Params:", templateParams);
+    console.log("====================================");
+
     try {
-      await emailjs.send(
-        "service_j8zr0ds",
-        "YOUR_TEMPLATE_ID",
+      /* -----------------------------------------------------
+         SEND EMAIL
+      ----------------------------------------------------- */
+
+      const response = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
         {
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          to_email: contact.email,
-        },
-        "YOUR_PUBLIC_KEY"
+          publicKey: EMAILJS_PUBLIC_KEY,
+        }
       );
+
+      /* -----------------------------------------------------
+         SUCCESS
+      ----------------------------------------------------- */
+
+      console.log("====================================");
+      console.log("✅ EMAILJS SUCCESS");
+      console.log("Status:", response.status);
+      console.log("Response:", response.text);
+      console.log("====================================");
 
       setStatus("success");
 
@@ -67,7 +166,17 @@ const Contact = ({ personalData }) => {
         message: "",
       });
     } catch (error) {
-      console.error("EmailJS Error:", error);
+      /* -----------------------------------------------------
+         ERROR
+      ----------------------------------------------------- */
+
+      console.error("====================================");
+      console.error("❌ EMAILJS ERROR");
+      console.error("Status:", error?.status);
+      console.error("Text:", error?.text);
+      console.error("Full Error:", error);
+      console.error("====================================");
+
       setStatus("error");
     } finally {
       setSending(false);
@@ -89,9 +198,9 @@ const Contact = ({ personalData }) => {
         lg:py-28
       "
     >
-      {/* =====================================
+      {/* =====================================================
           BACKGROUND GLOW
-      ===================================== */}
+      ===================================================== */}
 
       <div
         className="
@@ -123,10 +232,9 @@ const Contact = ({ personalData }) => {
         "
       />
 
-
-      {/* =====================================
+      {/* =====================================================
           CONTAINER
-      ===================================== */}
+      ===================================================== */}
 
       <div
         className="
@@ -137,10 +245,9 @@ const Contact = ({ personalData }) => {
           max-w-content
         "
       >
-
-        {/* =====================================
+        {/* ===================================================
             HEADER
-        ===================================== */}
+        =================================================== */}
 
         <motion.div
           className="mb-12"
@@ -160,7 +267,6 @@ const Contact = ({ personalData }) => {
             duration: 0.6,
           }}
         >
-
           <p
             className="
               text-sm
@@ -213,13 +319,11 @@ const Contact = ({ personalData }) => {
             {contact.message ||
               "Have a project, job opportunity, or technical question? Feel free to get in touch."}
           </p>
-
         </motion.div>
 
-
-        {/* =====================================
-            CONTACT INFO
-        ===================================== */}
+        {/* ===================================================
+            CONTACT INFORMATION
+        =================================================== */}
 
         <motion.div
           className="
@@ -245,149 +349,138 @@ const Contact = ({ personalData }) => {
             duration: 0.6,
           }}
         >
-
           {/* EMAIL */}
 
-          <a
-            href={`mailto:${contact.email}`}
-            className="
-              group
-              rounded-2xl
-              border
-              border-border
-              bg-card
-              p-5
-              transition-all
-              duration-300
-              hover:-translate-y-1
-              hover:border-primary/60
-              hover:shadow-primary
-            "
-          >
-
-            <div className="flex items-center gap-4">
-
-              <div
-                className="
-                  flex
-                  h-11
-                  w-11
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-xl
-                  bg-primary/10
-                  text-lg
-                  font-bold
-                  text-primary
-                "
-              >
-                @
-              </div>
-
-              <div className="min-w-0">
-
-                <p
+          {contact.email && (
+            <a
+              href={`mailto:${contact.email}`}
+              className="
+                group
+                rounded-2xl
+                border
+                border-border
+                bg-card
+                p-5
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:border-primary/60
+                hover:shadow-primary
+              "
+            >
+              <div className="flex items-center gap-4">
+                <div
                   className="
-                    text-xs
-                    font-semibold
-                    uppercase
-                    tracking-wider
-                    text-muted-dark
+                    flex
+                    h-11
+                    w-11
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-primary/10
+                    text-lg
+                    font-bold
+                    text-primary
                   "
                 >
-                  Email
-                </p>
+                  @
+                </div>
 
-                <p
-                  className="
-                    mt-1
-                    truncate
-                    text-sm
-                    font-medium
-                    text-text
-                    group-hover:text-primary
-                  "
-                >
-                  {contact.email}
-                </p>
+                <div className="min-w-0">
+                  <p
+                    className="
+                      text-xs
+                      font-semibold
+                      uppercase
+                      tracking-wider
+                      text-muted-dark
+                    "
+                  >
+                    Email
+                  </p>
 
+                  <p
+                    className="
+                      mt-1
+                      truncate
+                      text-sm
+                      font-medium
+                      text-text
+                      group-hover:text-primary
+                    "
+                  >
+                    {contact.email}
+                  </p>
+                </div>
               </div>
-
-            </div>
-
-          </a>
-
+            </a>
+          )}
 
           {/* PHONE */}
 
-          <a
-            href={`tel:${contact.phone}`}
-            className="
-              group
-              rounded-2xl
-              border
-              border-border
-              bg-card
-              p-5
-              transition-all
-              duration-300
-              hover:-translate-y-1
-              hover:border-primary/60
-              hover:shadow-primary
-            "
-          >
-
-            <div className="flex items-center gap-4">
-
-              <div
-                className="
-                  flex
-                  h-11
-                  w-11
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-xl
-                  bg-primary/10
-                  text-lg
-                "
-              >
-                ☎
-              </div>
-
-              <div>
-
-                <p
+          {contact.phone && (
+            <a
+              href={`tel:${contact.phone}`}
+              className="
+                group
+                rounded-2xl
+                border
+                border-border
+                bg-card
+                p-5
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:border-primary/60
+                hover:shadow-primary
+              "
+            >
+              <div className="flex items-center gap-4">
+                <div
                   className="
-                    text-xs
-                    font-semibold
-                    uppercase
-                    tracking-wider
-                    text-muted-dark
+                    flex
+                    h-11
+                    w-11
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-primary/10
+                    text-lg
                   "
                 >
-                  Phone
-                </p>
+                  ☎
+                </div>
 
-                <p
-                  className="
-                    mt-1
-                    text-sm
-                    font-medium
-                    text-text
-                    group-hover:text-primary
-                  "
-                >
-                  {contact.phone}
-                </p>
+                <div>
+                  <p
+                    className="
+                      text-xs
+                      font-semibold
+                      uppercase
+                      tracking-wider
+                      text-muted-dark
+                    "
+                  >
+                    Phone
+                  </p>
 
+                  <p
+                    className="
+                      mt-1
+                      text-sm
+                      font-medium
+                      text-text
+                      group-hover:text-primary
+                    "
+                  >
+                    {contact.phone}
+                  </p>
+                </div>
               </div>
-
-            </div>
-
-          </a>
-
+            </a>
+          )}
 
           {/* AVAILABILITY */}
 
@@ -400,9 +493,7 @@ const Contact = ({ personalData }) => {
               p-5
             "
           >
-
             <div className="flex items-center gap-4">
-
               <div
                 className="
                   flex
@@ -415,7 +506,6 @@ const Contact = ({ personalData }) => {
                   bg-success/10
                 "
               >
-
                 <span
                   className="
                     h-3
@@ -425,11 +515,9 @@ const Contact = ({ personalData }) => {
                     bg-success
                   "
                 />
-
               </div>
 
               <div>
-
                 <p
                   className="
                     text-xs
@@ -453,19 +541,14 @@ const Contact = ({ personalData }) => {
                   {personalInfo.availability ||
                     "Available for work"}
                 </p>
-
               </div>
-
             </div>
-
           </div>
-
         </motion.div>
 
-
-        {/* =====================================
-            MAIN CONTACT GRID
-        ===================================== */}
+        {/* ===================================================
+            MAIN GRID
+        =================================================== */}
 
         <div
           className="
@@ -474,10 +557,9 @@ const Contact = ({ personalData }) => {
             lg:grid-cols-[0.9fr_1.1fr]
           "
         >
-
-          {/* =====================================
+          {/* =================================================
               CONTACT FORM
-          ===================================== */}
+          ================================================= */}
 
           <motion.div
             initial={{
@@ -496,7 +578,6 @@ const Contact = ({ personalData }) => {
               duration: 0.6,
             }}
           >
-
             <form
               onSubmit={handleSubmit}
               className="
@@ -509,11 +590,9 @@ const Contact = ({ personalData }) => {
                 sm:p-8
               "
             >
-
               {/* FORM HEADER */}
 
               <div className="mb-7">
-
                 <p
                   className="
                     text-xs
@@ -549,13 +628,9 @@ const Contact = ({ personalData }) => {
                   technical issue, or collaboration, I'd be
                   happy to hear from you.
                 </p>
-
               </div>
 
-
-              {/* =================================
-                  NAME + EMAIL
-              ================================= */}
+              {/* NAME + EMAIL */}
 
               <div
                 className="
@@ -564,11 +639,9 @@ const Contact = ({ personalData }) => {
                   sm:grid-cols-2
                 "
               >
-
                 {/* NAME */}
 
                 <div>
-
                   <label
                     htmlFor="name"
                     className="
@@ -609,14 +682,11 @@ const Contact = ({ personalData }) => {
                       focus:ring-primary/20
                     "
                   />
-
                 </div>
-
 
                 {/* EMAIL */}
 
                 <div>
-
                   <label
                     htmlFor="email"
                     className="
@@ -657,18 +727,12 @@ const Contact = ({ personalData }) => {
                       focus:ring-primary/20
                     "
                   />
-
                 </div>
-
               </div>
 
-
-              {/* =================================
-                  SUBJECT
-              ================================= */}
+              {/* SUBJECT */}
 
               <div className="mt-5">
-
                 <label
                   htmlFor="subject"
                   className="
@@ -708,16 +772,11 @@ const Contact = ({ personalData }) => {
                     focus:ring-primary/20
                   "
                 />
-
               </div>
 
-
-              {/* =================================
-                  MESSAGE
-              ================================= */}
+              {/* MESSAGE */}
 
               <div className="mt-5">
-
                 <div
                   className="
                     mb-2
@@ -726,7 +785,6 @@ const Contact = ({ personalData }) => {
                     justify-between
                   "
                 >
-
                   <label
                     htmlFor="message"
                     className="
@@ -746,7 +804,6 @@ const Contact = ({ personalData }) => {
                   >
                     {formData.message.length}/{maxMessageLength}
                   </span>
-
                 </div>
 
                 <textarea
@@ -778,16 +835,13 @@ const Contact = ({ personalData }) => {
                     focus:ring-primary/20
                   "
                 />
-
               </div>
 
-
-              {/* =================================
-                  STATUS
-              ================================= */}
+              {/* =================================================
+                  STATUS - SUCCESS
+              ================================================= */}
 
               {status === "success" && (
-
                 <div
                   role="status"
                   className="
@@ -805,12 +859,13 @@ const Contact = ({ personalData }) => {
                   ✓ Message sent successfully. I'll get back
                   to you as soon as possible.
                 </div>
-
               )}
 
+              {/* =================================================
+                  STATUS - EMAILJS ERROR
+              ================================================= */}
 
               {status === "error" && (
-
                 <div
                   role="alert"
                   className="
@@ -826,15 +881,61 @@ const Contact = ({ personalData }) => {
                   "
                 >
                   ✕ Unable to send your message right now.
-                  Please try again or contact me directly by email.
+                  Please try again or contact me directly by
+                  email.
                 </div>
-
               )}
 
+              {/* =================================================
+                  STATUS - CONFIG ERROR
+              ================================================= */}
 
-              {/* =================================
+              {status === "config-error" && (
+                <div
+                  role="alert"
+                  className="
+                    mt-5
+                    rounded-lg
+                    border
+                    border-danger/30
+                    bg-danger/10
+                    px-4
+                    py-3
+                    text-sm
+                    text-danger
+                  "
+                >
+                  ✕ Email service is not configured correctly.
+                  Please check your EmailJS environment variables.
+                </div>
+              )}
+
+              {/* =================================================
+                  STATUS - VALIDATION ERROR
+              ================================================= */}
+
+              {status === "validation-error" && (
+                <div
+                  role="alert"
+                  className="
+                    mt-5
+                    rounded-lg
+                    border
+                    border-danger/30
+                    bg-danger/10
+                    px-4
+                    py-3
+                    text-sm
+                    text-danger
+                  "
+                >
+                  ✕ Please complete all fields before sending.
+                </div>
+              )}
+
+              {/* =================================================
                   SUBMIT BUTTON
-              ================================= */}
+              ================================================= */}
 
               <button
                 type="submit"
@@ -863,7 +964,6 @@ const Contact = ({ personalData }) => {
                   disabled:hover:translate-y-0
                 "
               >
-
                 {sending ? (
                   <>
                     <span
@@ -886,17 +986,13 @@ const Contact = ({ personalData }) => {
                     <span>→</span>
                   </>
                 )}
-
               </button>
-
             </form>
-
           </motion.div>
 
-
-          {/* =====================================
-              BOOKING
-          ===================================== */}
+          {/* =================================================
+              BOOKING / CALENDLY
+          ================================================= */}
 
           <motion.div
             className="
@@ -924,7 +1020,6 @@ const Contact = ({ personalData }) => {
               delay: 0.1,
             }}
           >
-
             {/* BOOKING HEADER */}
 
             <div
@@ -935,7 +1030,6 @@ const Contact = ({ personalData }) => {
                 sm:p-8
               "
             >
-
               <div
                 className="
                   flex
@@ -944,9 +1038,7 @@ const Contact = ({ personalData }) => {
                   gap-4
                 "
               >
-
                 <div className="flex items-start gap-4">
-
                   <div
                     className="
                       flex
@@ -964,7 +1056,6 @@ const Contact = ({ personalData }) => {
                   </div>
 
                   <div>
-
                     <p
                       className="
                         text-xs
@@ -998,13 +1089,9 @@ const Contact = ({ personalData }) => {
                       {booking.meetingDuration ||
                         "Choose a convenient time"}
                     </p>
-
                   </div>
-
                 </div>
-
               </div>
-
 
               <p
                 className="
@@ -1017,16 +1104,12 @@ const Contact = ({ personalData }) => {
                 {booking.description ||
                   "Choose a convenient date and time for us to discuss a project or opportunity."}
               </p>
-
             </div>
-
 
             {/* CALENDLY */}
 
             <div className="bg-bg-secondary">
-
-              {booking.enabled && booking.calendarUrl ? (
-
+              {bookingAvailable ? (
                 <InlineWidget
                   url={booking.calendarUrl}
                   styles={{
@@ -1034,9 +1117,7 @@ const Contact = ({ personalData }) => {
                     width: "100%",
                   }}
                 />
-
               ) : (
-
                 <div
                   className="
                     flex
@@ -1047,9 +1128,7 @@ const Contact = ({ personalData }) => {
                     text-center
                   "
                 >
-
                   <div>
-
                     <div className="mb-4 text-4xl">
                       📅
                     </div>
@@ -1079,72 +1158,65 @@ const Contact = ({ personalData }) => {
                       by email.
                     </p>
 
-                    <a
-                      href={`mailto:${contact.email}`}
-                      className="
-                        mt-5
-                        inline-flex
-                        items-center
-                        rounded-lg
-                        bg-gradient-primary
-                        px-5
-                        py-2.5
-                        text-sm
-                        font-semibold
-                        text-text
-                      "
-                    >
-                      Email Me →
-                    </a>
-
+                    {contact.email && (
+                      <a
+                        href={`mailto:${contact.email}`}
+                        className="
+                          mt-5
+                          inline-flex
+                          items-center
+                          rounded-lg
+                          bg-gradient-primary
+                          px-5
+                          py-2.5
+                          text-sm
+                          font-semibold
+                          text-text
+                        "
+                      >
+                        Email Me →
+                      </a>
+                    )}
                   </div>
-
                 </div>
-
               )}
-
             </div>
-
           </motion.div>
-
         </div>
 
-
-        {/* =====================================
+        {/* ===================================================
             FINAL CTA
-        ===================================== */}
+        =================================================== */}
 
-        <motion.div
-          className="
-            mt-8
-            text-center
-          "
-          initial={{
-            opacity: 0,
-            y: 15,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-        >
-
-          <p
+        {bookingAvailable && (
+          <motion.div
             className="
-              text-sm
-              text-muted
+              mt-8
+              text-center
             "
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+            }}
+            transition={{
+              duration: 0.5,
+            }}
           >
-            Prefer a quick conversation?
-          </p>
-
-          {booking.calendarUrl && booking.enabled && (
+            <p
+              className="
+                text-sm
+                text-muted
+              "
+            >
+              Prefer a quick conversation?
+            </p>
 
             <a
               href={booking.calendarUrl}
@@ -1165,11 +1237,8 @@ const Contact = ({ personalData }) => {
               Schedule a meeting
               <span>→</span>
             </a>
-
-          )}
-
-        </motion.div>
-
+          </motion.div>
+        )}
       </div>
     </section>
   );
