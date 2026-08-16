@@ -2,12 +2,50 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>myportfolio_2026</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicon.svg"
+    />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>
+      Michael Dean L. Belen | IT Officer & Web Developer
+    </title>
+
+    <!-- =====================================================
+         INITIAL THEME
+         Apply the saved theme BEFORE React renders.
+         This prevents the light-theme flash when dark mode
+         is stored in localStorage.
+    ====================================================== -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+
+          if (saved !== "light") {
+            document.documentElement.classList.add("dark");
+          }
+        } catch {
+          // Storage unavailable; default to dark theme.
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+
+    <script
+      type="module"
+      src="/src/main.jsx"
+    ></script>
   </body>
 </html>
